@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Mockup</title>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js" integrity="sha512-k2GFCTbp9rQU412BStrcD/rlwv1PYec9SNrkbQlo6RZCf75l6KcC3UwDY8H5n5hl4v77IDtIPwOk9Dqjs/mMBQ==" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.css" integrity="sha512-Woz+DqWYJ51bpVk5Fv0yES/edIMXjj3Ynda+KWTIkGoynAMHrqTcDUQltbipuiaD5ymEo9520lyoVOo9jCQOCA==" crossorigin="anonymous" />
+   -->
+
+  <style>
+    /* body { margin: 0; } */
+    #canvas {
+      width: 80vw;
+      height: 70vh;
+      display: block;
+      margin: auto
+    }
+
+    #info {
+      position: absolute;
+      left: 0;
+      top: 0;
+      text-align: center;
+      width: 100%;
+      margin: 4px;
+      /* background: black;
+ color: white; padding: 0.5em;  */
+      /* font-family: monospace;  */
+    }
+
+
+    /* HTML CSS JSResult Skip Results Iframe */
+    .c-modal {
+      --i-close: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" fill="none"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>');
+      background-color: rgba(0, 0, 0, .45);
+      color: hsl(162, 10%, 20%);
+      bottom: 0;
+      display: none;
+      left: 0;
+      place-items: center;
+      position: fixed;
+      right: 0;
+      top: 0;
+    }
+
+    .c-modal:target {
+      display: grid;
+    }
+
+    .c-modal__accept {
+      background-color: hsl(162, 50%, 34%);
+      border: 0;
+      border-radius: 0.25rem;
+      color: hsl(162, 68%, 100%);
+      margin-inline-start: 1rem;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+    }
+
+    .c-modal__cancel {
+      color: hsl(162, 10%, 40%);
+    }
+
+    .c-modal__close {
+      --ico: var(--i-close);
+      --ico-c: currentColor;
+      --w: 2.5rem;
+      border-radius: 50%;
+      display: grid;
+      height: var(--w);
+      /*   inset-inline-end: 1rem; */
+      right: 1rem;
+      place-items: center;
+      position: absolute;
+      top: 1rem;
+      width: var(--w);
+    }
+
+    .c-modal__close::after {
+      background-color: var(--ico-c, #000);
+      content: "";
+      display: inline-block;
+      height: 100%;
+      width: 100%;
+      mask: no-repeat center/var(--ico-w, 2rem) var(--ico);
+      -webkit-mask: no-repeat center/var(--ico-w, 2rem) var(--ico);
+    }
+
+    .c-modal__close:focus {
+      background-color: hsl(162, 20%, 95%);
+      outline: none;
+    }
+
+    .c-modal__headline {
+      line-height: 1.2;
+      margin: 0 0 .82em 0;
+      width: calc(100% - 2.5rem);
+    }
+
+    .c-modal__inner {
+      background-color: #FFF;
+      border-radius: .25rem;
+      box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1), 0px 4px 6px -2px rgba(0, 0, 0, 0.05);
+      max-width: 60%;
+      padding: 1.25rem;
+      position: relative;
+    }
+
+    .c-modal__nav {
+      align-items: center;
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-block-start: 1rem;
+    }
+
+    @media (hover: hover) {
+      .c-modal__accept:hover {
+        background-color: hsl(162, 50%, 24%);
+      }
+
+      .c-modal__close:hover {
+        background-color: hsl(162, 20%, 90%);
+      }
+    }
+
+    /* For this demo only */
+    body {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      line-height: 1.6;
+      margin: 2rem auto;
+    }
+
+    html,
+    body {
+      margin: auto;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    p {
+      color: #717171;
+      margin: 2rem auto;
+      max-width: 80vw;
+    }
+
+    table {
+      margin: auto;
+      width: 80vw;
+      text-align: center;
+    }
+
+
+
+    /* Resources1× 0.5× 0.25×Rerun */
+  </style>
+
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/7.15.3/firebase-app.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/7.15.3/firebase-analytics.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.15.3/firebase-database.js"></script>
+
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyAO2O2T1N8FC5f2vJ55EVhPFkQL9HXRjSs",
+      authDomain: "codetracker-5db3d.firebaseapp.com",
+      databaseURL: "https://codetracker-5db3d.firebaseio.com",
+      projectId: "codetracker-5db3d",
+      storageBucket: "codetracker-5db3d.appspot.com",
+      messagingSenderId: "500210027842",
+      appId: "1:500210027842:web:ff21b1b596fd063c"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    var database = firebase.database();
+
+    // function writeNewPost(uid, posX, posY, posZ) {
+    //   // A post entry.
+    //   var postData = {
+    //     uid: uid,
+    //     posX: posX,
+    //     posY: posY,
+    //     posZ: posZ,
+    //   };
+
+    function writeNewPost(name, posObject, emotion, comment, dept, elementName, deleted, index) {
+      var postData = {
+        pos: posObject,
+        comment: comment,
+        emo: emotion,
+        element: elementName,
+        show: deleted
+      };
+
+      var newPostKey = firebase.database().ref().child('posts').push().key;
+
+      // Write the new post's data simultaneously in the posts list and the user's post list.
+      var updates = {};
+      updates['/department-' + dept + '/' + name + '/' + index] = postData;
+      // updates['/user-posts/' + uid + '/' + newPostKey] = postData;
+
+      return firebase.database().ref().update(updates);
+    }
+
+  </script>
+  <script>/*
+Basic :focus-trapping in 556 bytes before gzip.
+Replace `href` with `button,[href],select,textarea,input:not([type="hidden"]),[tabindex]:not([tabindex="-1"])` for supporting all focusable elements.
+*/
+    let D = document;
+    function K(e) {
+      if ("Tab" === e.key) {
+        e.preventDefault();
+        let t = this.__f.length - 1, n = this.__f.indexOf(e.target);
+        (n = e.shiftKey ? n - 1 : n + 1) < 0 && (n = t), n > t && (n = 0), this.__f[n].focus()
+      }
+      "Escape" === e.key && (location.hash = "#")
+    }
+    addEventListener("hashchange", e => {
+      let t = location.hash;
+      if (t.length > 1) {
+        let e = D.getElementById(t.substr(1));
+        e && (e.addEventListener("keydown", K), e.__f = [...e.querySelectorAll('[href]')], e.__f[0].focus())
+      } else {
+        let [t, n] = e.oldURL.split("#");
+        n && (D.getElementById(n).removeEventListener("keydown", K), D.querySelector(`[href="#${n}"]`).focus())
+      }
+    })
+
+    /* DEMO: Trigger open */
+    location.hash = "login"
+  </script>
+</head>
+
+<body>
+
+  <div id="info"></div>
+
+  <canvas id="canvas"></canvas>
+
+
+  <div class="c-modal" id="login">
+    <div class="c-modal__inner">
+      <h2 class="c-modal__headline">Sign Up</h2>
+      <a href="#login" class="c-modal__close" aria-label="Close modal"></a>
+      <div class="c-modal__content">Please enter your user information:<br>
+        <label>Name: </label>
+        <input id='username' type="text" style="float: right; width:142px"><br>
+        <label>Department: </label>
+        <select name="dept" id="dept" style="float:right; width:150px">
+          <option value="Nurse">Nurse</option>
+          <option value="Staff">Staff</option>
+          <option value="Veteran">Veteran</option>
+          <option value="Other">Other</option>
+        </select>
+
+      </div>
+
+      <div class="c-modal__nav">
+
+        <button onclick="enteredUserData()">Enter</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="c-modal" id="modal">
+    <div class="c-modal__inner">
+      <h2 class="c-modal__headline"  id="putObjectNameHere" ></h2>
+      <!-- <a href="#" class="c-modal__close" aria-label="Close modal"></a> -->
+      <div class="c-modal__content">
+        <!-- You clicked on an object -->
+        <table style="max-width: 55vw;">
+          <tr>
+            <!-- <th>
+            Delete
+          </th> -->
+            <!-- <th>
+              Element Name
+            </th> -->
+            <th>
+              Please elaborate on the rating you provided:
+            </th>
+            <th>
+              Rating:
+            </th>
+          </tr>
+          <tr>
+            <!-- <td>
+            <button>x</button>
+          </td> -->
+            <!-- <td>
+              <p id="putObjectNameHere"></p>
+            </td> -->
+            <td>
+              <!-- <input type="text" id="userText" style="width: 100%;"> -->
+              <textarea id="userText" rows="4" cols="50" style="width: 80%;"></textarea>
+            </td>
+            <td>
+              <label for="negative">Negative, not desirable</label>
+              <input type="radio" id="negative" name="emotion" value="negative"><br>
+              
+              
+              <label for="neutral">OK but needs improvement  </label>
+              <input type="radio" id="neutral" name="emotion" value="neutral"><br>
+              
+              <label for="positive">Positive, design is desirable</label>
+              <input type="radio" id="positve" name="emotion" value="positve" checked><br>
+              
+
+              
+            </td>
+
+          </tr>
+        </table>
+      </div>
+
+      <div class="c-modal__nav">
+
+        <!-- <a href="#" class="c-modal__cancel"> -->
+        <button onclick="popLastElement()">Cancel</button>
+        <!-- </a> -->
+        <button onclick="pushElement()">Accept</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="app">
+
+    <div class="product">
+
+
+      <div class="product-info">
+
+        <p>
+          INSTRUCTIONS: Double click on any element to leave us a comment. This information will be used to help us
+          design the new patient room.
+        </p>
+
+        <p>
+          <strong>Name: </strong>{{ name[0] }} <br>
+          <strong>Department: </strong> {{ department[0] }}<br>
+        </p>
+
+
+        <table>
+          <tr>
+            <th>
+              Delete
+            </th>
+            <th>
+              Element Name
+            </th>
+            <th>
+              Comment
+            </th>
+            <th>
+              Emotion
+            </th>
+          </tr>
+          <tr v-for="(object, index) in objects">
+            <td v-show="show[index] == 1">
+              <button v-on:click="deleteThis(index)">x</button>
+            </td>
+            <td  v-show="show[index] == 1">
+              {{object}}
+            </td>
+            <td v-show="show[index] == 1">
+              {{text[index]}}
+              <!-- <input type="textbox"> -->
+            </td>
+            <td  v-show="show[index] == 1">
+              {{emotion[index]}}
+            </td>
+
+          </tr>
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+
+  <script>
+    //Add an array of sizes to the data and use v-for to display them in a list. 
+
+    let scene;
+
+    let listOfClickedObjects = []
+    let commentBalls = []
+    let userText = []
+    let emotion1 = []
+
+    // let commentObject = {
+    //   name: username,
+    //   department: dept,
+    //   entered: setInfo,
+    //   objects: listOfClickedObjects,
+    //   balls: commentBalls,
+    //   text: userText,
+    //   emotion: emotion1,
+    //   show: showInTable
+    // }
+
+
+
+    function popLastElement() {
+      scene.remove(commentBalls[commentBalls.length-1])
+      commentBalls.pop();
+      listOfClickedObjects.pop()
+      // console.log(listOfClickedObjects)
+      location.hash = "#";
+
+    }
+
+    let username = []
+    let actualUsername = ''
+    let dept = []
+    let setInfo = false;
+    let showInTable = []
+
+    function enteredUserData() {
+      username.push(document.getElementById("username").value)
+      actualUsername = document.getElementById("username").value + "-" + parseInt(Math.random() * 1000)
+      dept.push(document.getElementById("dept").value)
+      setInfo = true;
+      console.log(document.getElementById("username").value)
+      location.hash = ''
+    }
+
+    let runningCountOfComments = 0
+    let commentPosition = {
+      x: 0,
+      y: 0,
+      z: 0
+    }
+    let elementName = ''
+
+    function pushElement() {
+      showInTable.push(1)
+      console.log(document.getElementById("userText").value)
+      let myComment = document.getElementById("userText").value + "."
+      userText.push(myComment)
+      // emotion1.push(document.getElementById("emotion").value)
+      let myEmotion = document.querySelector('input[name="emotion"]:checked').value
+      emotion1.push(myEmotion)
+      
+
+      // writeNewPost(name, posObject, emotion, comment, dept, deleted, index)
+      writeNewPost(actualUsername, commentPosition, myEmotion + "a", myComment, dept[0], elementName + "a", 0, runningCountOfComments)
+      location.hash = "#";
+      runningCountOfComments++
+    }
+
+    // function deleteThis(x){
+    //   console.log(x)
+    //   showInTable[x] = 0;
+    //   // writeNewPost(actualUsername, commentPosition, myEmotion + "a", myComment, dept[0], elementName + "a", 1, runningCountOfComments)
+    // }
+
+    var app = new Vue({
+      el: '#app',
+      data: {
+        name: username,
+        department: dept,
+        entered: setInfo,
+        objects: listOfClickedObjects,
+        balls: commentBalls,
+        text: userText,
+        emotion: emotion1,
+        show: showInTable
+
+        // sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL']
+      },// define methods under the `methods` object
+  methods: {
+    deleteThis: function (x) {
+      // `this` inside methods points to the Vue instance
+      showInTable[x] = 0;
+      console.log(x)
+      showInTable.push(0)
+      showInTable.pop()
+
+      scene.remove(commentBalls[x])
+      // commentBalls.splice(x, 1);
+      // listOfClickedObjects.splice(x, 1);
+      commentBalls.remove(x)
+      listOfClickedObjects.remove(x)
+      // `event` is the native DOM event
+      // if (event) {
+      //   alert(event.target.tagName)
+      // }
+    }
+  }
+    })
+
+
+
+
+  </script>
+
+  <script type="module">
+
+
+
+    import * as THREE from '../build/three.module.js';
+
+    import { OrbitControls } from './jsm/controls/OrbitControls.js';
+    import { Rhino3dmLoader } from './jsm/loaders/3DMLoader.js';
+    import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+    // import Stats from './jsm/libs/stats.module.js';
+
+    // let stats;
+
+    const cursor = {
+      x: 0,
+      y: 0
+    }
+
+    const sizes = {
+      width: window.innerWidth,
+      height: window.innerHeight
+    }
+    function main() {
+      const canvas = document.querySelector('#canvas');
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.gammaOutput = true;
+    renderer.gammaFactor = 2.2;
+    renderer.shadowMap.enabled = true;
+
+
+      // THREE.Object3D.DefaultUp = new THREE.Vector3(0, 0, 1);
+
+      const fov = 70;
+      const aspect = 2;  // the canvas default
+      const near = 0.01;
+      const far = 100;
+      const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+      // camera.position.z = 30;
+      camera.position.set(1.1, 0, -1.7)
+      // camera.lookAt(0,0, 55);
+      // camera.position.y = 500;
+
+      scene = new THREE.Scene({ antialias: true });
+      scene.background = new THREE.Color('white');
+
+      // put the camera on a pole (parent it to an object)
+      // so we can spin the pole to move the camera around the scene
+      // const cameraPole = new THREE.Object3D();
+      // scene.add(cameraPole);
+      // cameraPole.add(camera);
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1.52)
+      scene.add(ambientLight)
+
+      let directionalLight = new THREE.DirectionalLight(0xfffff0);
+      directionalLight.position.set(4.3, 4, 10);
+      directionalLight.castShadow = true;
+      directionalLight.intensity = 2.2;
+      directionalLight.shadow.bias = 0.00002;
+      directionalLight.shadow.normalBias = 0.42;
+      directionalLight.shadow.radius = 2.04;
+      scene.add(directionalLight);
+
+      console.log(directionalLight)
+
+     
+
+
+      // directionalLight = new THREE.DirectionalLight(0xffffff);
+      // directionalLight.position.set(-1, 1, 1);
+      // directionalLight.castShadow = false;
+      // directionalLight.intensity = 0.6;
+      // scene.add(directionalLight);
+
+
+      // directionalLight = new THREE.DirectionalLight(0xffffff);
+      // directionalLight.position.set(-1, 1, -1);
+      // directionalLight.castShadow = false;
+      // directionalLight.intensity = 0.5;
+      // scene.add(directionalLight);
+
+
+      // directionalLight = new THREE.DirectionalLight(0xffffff);
+      // directionalLight.position.set(1, 1, -1);
+      // directionalLight.castShadow = false;
+      // directionalLight.intensity = 0.6;
+      // scene.add(directionalLight);
+
+
+      // const color = 0xFFFFFF;
+      // const intensity = 1;
+      // const light = new THREE.DirectionalLight(color, intensity);
+      // light.position.set(-1, 2, 4);
+      // camera.add(light);
+
+      const controls = new OrbitControls(camera, canvas);
+      controls.mouseButtons = {
+        LEFT: THREE.MOUSE.ROTATE,
+        MIDDLE: THREE.MOUSE.DOLLY,
+        RIGHT: THREE.MOUSE.PAN
+      }
+      controls.keys = {
+        LEFT: 37, //left arrow
+        UP: 38, // up arrow
+        RIGHT: 39, // right arrow
+        BOTTOM: 40 // down arrow
+      }
+      // controls.target.set(0, 0, 0);
+      controls.update();
+
+      // stats = new Stats();
+      // stats = new Stats();
+			// 	canvas.appendChild( stats.dom );
+
+
+      function frameArea(sizeToFitOnScreen, boxSize, boxCenter, camera) {
+        const halfSizeToFitOnScreen = sizeToFitOnScreen * 0.5;
+        const halfFovY = THREE.Math.degToRad(camera.fov * .5);
+        const distance = halfSizeToFitOnScreen / Math.tan(halfFovY);
+
+
+        camera.updateProjectionMatrix();
+
+        // point the camera to look at the center of the box
+        // camera.lookAt(boxCenter.x, boxCenter.y, boxCenter.z);
+      }
+
+      let pickableMeshes = [];
+
+      let logged = true;
+
+      // const loader = new Rhino3dmLoader();
+      // loader.setLibraryPath('jsm/libs/rhino3dm/');
+
+      // loader.load('models/3dm/patientRoom2.3dm', function (object) {
+
+      //   scene.add(object);
+      //   // initGUI( object.userData.layers );
+
+      //   object.traverse((node) => {
+      //     if (node instanceof THREE.Mesh) {
+      //       if (logged) {
+      //         console.log(node)
+      //         logged = false
+      //       }
+
+      //       node.material.transparent = true;
+      //       pickableMeshes.push(node);
+      //     }
+
+      //   });
+      // });
+
+      const loader = new GLTFLoader().setPath( 'models/gltf/' );
+						loader.load( 'cabinet15.glb', function ( gltf ) {
+
+							gltf.scene.traverse( function ( child ) {
+
+								if ( child.isMesh ) {
+                  // console.log(child)
+
+                  if(child.name != "Type_A_Sidelight_Left_3"){
+                    child.castShadow = true;
+                    child.receiveShadow = true
+                  }else{
+                    child.castShadow = false;
+                    child.receiveShadow = false
+                    child.material.opacity = 0.1;
+                    console.log(child)
+                  }
+
+                  child.material.transparent = true;
+            pickableMeshes.push(child);
+
+									// TOFIX RoughnessMipmapper seems to be broken with WebGL 2.0
+									// roughnessMipmapper.generateMipmaps( child.material );
+
+								}
+
+							} );
+
+							scene.add( gltf.scene );
+
+							// roughnessMipmapper.dispose();
+
+							render();
+
+            } );
+            
+            console.log(pickableMeshes)
+
+
+      let hoverStickyNote = new THREE.Mesh(
+            new THREE.CubeGeometry(0.1,0.1,0.01),
+            new THREE.MeshBasicMaterial({ color: 0xaaaaFF }),
+          );
+          scene.add(hoverStickyNote)
+
+
+      function resizeRendererToDisplaySize(renderer) {
+        const canvas = renderer.domElement;
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
+        const needResize = canvas.width !== width || canvas.height !== height;
+        if (needResize) {
+          renderer.setSize(width, height, false);
+        }
+        return needResize;
+      }
+
+      let currentPoint = { x: 0, y: 0, z: 0 };
+      let currentlyHoveringOverAnObject = false;
+      let nameOfObject = "";
+      let mouseInCanvas = true;
+      let objectNormal = new THREE.Vector3(0,0,0);
+
+
+      class PickHelper {
+        constructor() {
+          this.raycaster = new THREE.Raycaster();
+          this.pickedObject = null;
+          this.pickedObjectSavedMaterial = null;
+          this.selectMaterial = new THREE.MeshBasicMaterial();
+          this.infoElem = document.querySelector('#info');
+        }
+        pick(normalizedPosition, scene, camera, time) {
+
+          if (setInfo) {
+            // restore the color if there is a picked object
+            if (this.pickedObject) {
+              this.pickedObject.material = this.pickedObjectSavedMaterial;
+              this.pickedObject = undefined;
+              this.infoElem.textContent = '';
+            }
+
+            // cast a ray through the frustum
+            this.raycaster.setFromCamera(normalizedPosition, camera);
+            // get the list of objects the ray intersected
+            const intersectedObjects = this.raycaster.intersectObjects(pickableMeshes);
+            if (intersectedObjects.length && mouseInCanvas) {
+              currentlyHoveringOverAnObject = true
+              // pick the first object. It's the closest one
+              // console.log(intersectedObjects[0])
+              objectNormal = intersectedObjects[0].face.normal;
+              currentPoint.x = intersectedObjects[0].point.x;
+              currentPoint.y = intersectedObjects[0].point.y;
+              currentPoint.z = intersectedObjects[0].point.z;
+              nameOfObject = intersectedObjects[0].object.name
+              this.pickedObject = intersectedObjects[0].object;
+              // save its color
+              this.pickedObjectSavedMaterial = this.pickedObject.material;
+              let opaqueMaterial = this.pickedObject.material.clone()
+              // this.pickedObject.material = this.selectMaterial;
+              // flash select material color to flashing red/yellow
+              // this.selectMaterial.color.setHex(0xFF0000);
+              // this.pickedObject.material.opacity = 1
+              opaqueMaterial.opacity = 1;
+              this.pickedObject.material = opaqueMaterial
+              this.infoElem.textContent = this.pickedObject.name;
+            } else {
+              currentlyHoveringOverAnObject = false
+            }
+          }
+        }
+
+      }
+
+      let cubeNumber = 0;
+      var doClickOnRelease = false;
+      
+
+
+      function onDocumentMouseDown(event) {
+        doClickOnRelease = true;
+
+        
+
+        if (currentlyHoveringOverAnObject && doClickOnRelease) {
+
+
+          event.preventDefault();
+
+          const cube = new THREE.Mesh(
+            new THREE.CubeGeometry(0.1,0.1,0.01),
+            new THREE.MeshBasicMaterial({ color: 0x0000FF }),
+          );
+
+          if (!nameOfObject.startsWith('comment')) {
+            console.log(objectNormal)
+            cubeNumber++
+            let myLookAt = new THREE.Vector3(objectNormal.x, objectNormal.z, objectNormal.y)
+            cube.lookAt(myLookAt)
+            cube.position.x = currentPoint.x
+            cube.position.y = currentPoint.y
+            cube.position.z = currentPoint.z
+            
+
+            commentPosition.x = currentPoint.x
+            commentPosition.y = currentPoint.y
+            commentPosition.z = currentPoint.z
+
+            elementName = nameOfObject
+
+            cube.name = "comment" + cubeNumber
+            // console.log(currentPoint)
+            // console.log("success")
+            // console.log("the name of this object is: " + nameOfObject)
+            listOfClickedObjects.push(nameOfObject)
+            location.hash = 'modal';
+            document.getElementById("putObjectNameHere").innerHTML = nameOfObject
+
+            // pickableMeshes.push(cube)
+            commentBalls.push(cube)
+
+            scene.add(cube)
+          } else {
+            // console.log("you wrote this here")
+          }
+
+
+        }
+
+
+      }
+
+      const pickPosition = { x: 0, y: 0 };
+      const pickHelper = new PickHelper();
+      clearPickPosition();
+
+      function render(time) {
+
+        if(currentlyHoveringOverAnObject){
+
+          if(currentlyHoveringOverAnObject){
+            hoverStickyNote.lookAt(new THREE.Vector3(0,0,0))
+            hoverStickyNote.position.x = 0
+          hoverStickyNote.position.y = 0
+          hoverStickyNote.position.z = 0
+          // hoverStickyNote.lookAt(objectNormal)
+          let myLookAt = new THREE.Vector3(objectNormal.x, objectNormal.z, objectNormal.y)
+          hoverStickyNote.lookAt(myLookAt)
+          hoverStickyNote.position.x = currentPoint.x
+          hoverStickyNote.position.y = currentPoint.y
+          hoverStickyNote.position.z = currentPoint.z
+        }
+        // else{
+        //   hoverStickyNote.setPosition(1000,1000,1000)
+        // }
+
+          // console.log("hovering")
+          for (let i = 0; i < pickableMeshes.length; i++) {
+          if (pickableMeshes[i].material.opacity != 0.1) {
+            pickableMeshes[i].material.opacity = 0.9
+          }
+        }
+        time *= 0.001;  // convert to seconds;
+
+        if (resizeRendererToDisplaySize(renderer)) {
+          const canvas = renderer.domElement;
+          camera.aspect = canvas.clientWidth / canvas.clientHeight;
+          camera.updateProjectionMatrix();
+        }
+        }else{
+          // console.log("not hovering")
+          for (let i = 0; i < pickableMeshes.length; i++) {
+          if (pickableMeshes[i].material.opacity != 0.1) {
+            pickableMeshes[i].material.opacity = 1
+          }
+        }
+      }
+        
+
+
+        pickHelper.pick(pickPosition, scene, camera, time);
+
+        // console.log(camera.position.x, camera.position.y, camera.position.z)
+        // stats.update();
+
+        requestAnimationFrame(render);
+        controls.update();
+        renderer.render(scene, camera);
+
+
+      }
+      requestAnimationFrame(render);
+
+      function getCanvasRelativePosition(event) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: event.clientX - rect.left,
+          y: event.clientY - rect.top,
+        };
+      }
+
+      function setPickPosition(event) {
+        const pos = getCanvasRelativePosition(event);
+        pickPosition.x = (pos.x / canvas.clientWidth) * 2 - 1;
+        pickPosition.y = (pos.y / canvas.clientHeight) * -2 + 1;  // note we flip Y
+        // console.log(pickPosition.x, pickPosition.y)
+        if (pickPosition.y < -1) {
+          pickPosition.y = -100000
+          mouseInCanvas = false;
+          // currentlyHoveringOverAnObject = false
+        }else{
+          mouseInCanvas = true
+        }
+      }
+
+      function clearPickPosition() {
+        // unlike the mouse which always has a position
+        // if the user stops touching the screen we want
+        // to stop picking. For now we just pick a value
+        // unlikely to pick something
+        pickPosition.x = -100000;
+        pickPosition.y = -100000;
+        doClickOnRelease = false;
+      }
+      // window.addEventListener('mousemove', setPickPosition);
+      window.addEventListener('mouseout', clearPickPosition);
+      window.addEventListener('mouseleave', clearPickPosition);
+      // document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+      window.addEventListener('dblclick', onDocumentMouseDown, false);
+
+
+      window.addEventListener('touchstart', (event) => {
+        // prevent the window from scrolling
+        event.preventDefault();
+        setPickPosition(event.touches[0]);
+      }, { passive: false });
+
+      window.addEventListener('touchmove', (event) => {
+        doClickOnRelease = false;
+        setPickPosition(event.touches[0]);
+      });
+
+      window.addEventListener('touchend', clearPickPosition);
+
+      window.addEventListener('mousemove', (event) => {
+        doClickOnRelease = false;
+        setPickPosition(event)
+        cursor.x = event.clientX / sizes.width - 0.5
+        cursor.y = - (event.clientY / sizes.height - 0.5)
+      })
+
+      window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+    
+
+
+
+    main();
+  </script>
+
+
+</body>
+
+</html>

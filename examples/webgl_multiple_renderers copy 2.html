@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>three.js webgl - multiple renderers</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+	<style>
+		body {
+			background-color: #fff;
+			color: #444;
+			width: 100%;
+			height: 100%;
+			margin: 0px;
+			overflow: hidden;
+		}
+		*{
+			margin: 0px;
+		}
+
+		a {
+			color: #08f;
+		}
+
+		canvas {
+			display: inline-block !important;
+			margin: 0px;
+			padding: 0px;
+		}
+	</style>
+
+
+	<script src="https://www.gstatic.com/firebasejs/7.15.3/firebase-app.js"></script>
+
+	<script src="https://www.gstatic.com/firebasejs/7.15.3/firebase-analytics.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/7.15.3/firebase-database.js"></script>
+
+
+	<script>
+		// Your web app's Firebase configuration
+		var firebaseConfig = {
+			apiKey: "AIzaSyAO2O2T1N8FC5f2vJ55EVhPFkQL9HXRjSs",
+			authDomain: "codetracker-5db3d.firebaseapp.com",
+			databaseURL: "https://codetracker-5db3d.firebaseio.com",
+			projectId: "codetracker-5db3d",
+			storageBucket: "codetracker-5db3d.appspot.com",
+			messagingSenderId: "500210027842",
+			appId: "1:500210027842:web:ff21b1b596fd063c"
+		};
+		// Initialize Firebase
+		firebase.initializeApp(firebaseConfig);
+		firebase.analytics();
+
+		var database = firebase.database();
+
+		// function writeNewPost(uid, posX, posY, posZ) {
+		//   // A post entry.
+		//   var postData = {
+		//     uid: uid,
+		//     posX: posX,
+		//     posY: posY,
+		//     posZ: posZ,
+		//   };
+
+		function writeNewPost(name, posObject, emotion, comment, dept, elementName, deleted, index) {
+			var postData = {
+				pos: posObject,
+				comment: comment,
+				emo: emotion,
+				element: elementName
+			};
+
+			var newPostKey = firebase.database().ref().child('posts').push().key;
+
+			// Write the new post's data simultaneously in the posts list and the user's post list.
+			var updates = {};
+			updates['/department-' + dept + '/' + name + '/' + index] = postData;
+			// updates['/user-posts/' + uid + '/' + newPostKey] = postData;
+
+			return firebase.database().ref().update(updates);
+		}
+
+	</script>
+</head>
+
+<body>
+
+
+
+	<div id="info" style="font-size: larger;">Virtual Patient Room Results Viewer
+	</div>
+
+	<script type="module">
+
+		import * as THREE from '../build/three.module.js';
+		import { GUI } from './jsm/libs/dat.gui.module.js';
+		import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+
+		let camera, camera2, camera3, camera4, scene, renderer, renderer2, renderer3, renderer4;
+
+		let mesh1;
+		const color = new THREE.Color();
+		const pickPosition = { x: 0, y: 0 };
+		let cursor = {
+			x:0,
+			y:0
+		}
+
+		let INTERSECTED;
+		let raycaster, raycaster2, raycaster3, raycaster4;
+
+		const mouse = new THREE.Vector2();
+
+		let onDocumentMouseMove = (event) => {
+			cursor.x = event.x
+			cursor.y = event.y
+
+			event.preventDefault();
+
+			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+			// console.log(mouse.x, mouse.y)
+  // console.log(`mouse position: ${event.x}:${event.y}`);
+};
+
+let stickyNoteArray = []
+
+function map_range(value, low1, high1, low2, high2) {
+    return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+}
+
+		init();
+		animate();
+
+		function init() {
+
+			camera = new THREE.PerspectiveCamera(50, window.innerWidth / (window.innerHeight), .01, 10);
+			camera.position.z = 6
+
+			camera2 = new THREE.PerspectiveCamera(50, window.innerWidth / (window.innerHeight), .01, 10);
+			camera2.position.x = 6
+
+			camera3 = new THREE.PerspectiveCamera(50, window.innerWidth / (window.innerHeight), .01, 10);
+			camera3.position.z = -6
+
+			camera4 = new THREE.PerspectiveCamera(50, window.innerWidth / (window.innerHeight), .01, 10);
+			camera4.position.x = -6
+
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color(0xffffff);
+
+			const ambientLight = new THREE.AmbientLight(0xffffff, 1.52)
+			scene.add(ambientLight)
+
+			let directionalLight = new THREE.DirectionalLight(0xfffff0);
+			directionalLight.position.set(4.3, 4, 10);
+			directionalLight.castShadow = true;
+			directionalLight.intensity = 2.2;
+			directionalLight.shadow.bias = 0.00002;
+			directionalLight.shadow.normalBias = 0.42;
+			directionalLight.shadow.radius = 2.04;
+			scene.add(directionalLight);
+
+			const globalPlane = new THREE.Plane(new THREE.Vector3(-1, 0, 0), 0);
+
+			const localPlane = new THREE.Plane(new THREE.Vector3(-1, 0, 0), 0);
+			const localPlane2 = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+
+			const localPlane3 = new THREE.Plane(new THREE.Vector3(1, 0, 0), 0);
+			const localPlane4 = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+
+
+
+			// shadow
+
+			const canvas = document.createElement('canvas');
+			canvas.width = 128;
+			canvas.height = 128;
+
+			const context = canvas.getContext('2d');
+			const gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
+			gradient.addColorStop(0.1, 'rgba(210,210,210,1)');
+			gradient.addColorStop(1, 'rgba(255,255,255,1)');
+
+			context.fillStyle = gradient;
+			context.fillRect(0, 0, canvas.width, canvas.height);
+
+			const loader = new GLTFLoader().setPath('models/gltf/');
+			loader.load('cabinet15.glb', function (gltf) {
+
+				gltf.scene.traverse(function (child) {
+
+					if (child.isMesh) {
+						// console.log(child)
+
+						if (child.name != "Type_A_Sidelight_Left_3") {
+							child.castShadow = true;
+							child.receiveShadow = true
+						} else {
+							child.castShadow = false;
+							child.receiveShadow = false
+							child.material.opacity = 0.1;
+							console.log(child)
+						}
+						child.material.transparent = true;
+					}
+				});
+
+				scene.add(gltf.scene);
+
+			});
+
+			raycaster = new THREE.Raycaster();
+			raycaster2 = new THREE.Raycaster();
+
+			raycaster3 = new THREE.Raycaster();
+			raycaster4 = new THREE.Raycaster();
+			document.addEventListener( 'mousemove', onDocumentMouseMove );
+
+			function snapshotToArray(snapshot) {
+				var returnArr = [];
+
+				snapshot.forEach(function (childSnapshot) {
+					var item = childSnapshot.val();
+					item.key = childSnapshot.key;
+
+					returnArr.push(item);
+				});
+
+				return returnArr;
+			};
+
+			
+
+			var starCountRef = firebase.database().ref('/department-Nurse/').once('value').then(function (snapshot) {
+				// currentArrayNumM = 0;
+				let monData = (snapshotToArray(snapshot));
+				for (let i = 0; i < monData.length; i++) {
+					for (let j = 0; j < monData[i].length; j++) {
+						// console.log(monData[i][j].pos.z)
+
+						let cube = new THREE.Mesh(
+							new THREE.CubeGeometry(0.1, 0.1, 0.1),
+							new THREE.MeshBasicMaterial({ color: 0x0000FF }),
+						);
+						cube.position.x = monData[i][j].pos.x
+						cube.position.y = monData[i][j].pos.y
+						cube.position.z = monData[i][j].pos.z
+						cube.userData.comment = monData[i][j].comment
+						cube.userData.element = monData[i][j].element
+						cube.userData.emotion = monData[i][j].emo
+						cube.userData.name = monData[i].key
+						// console.log(monData[i].key)
+
+						stickyNoteArray.push(cube)
+
+						scene.add(cube)
+					}
+				}
+				console.log(monData)
+			})
+
+
+
+			renderer = new THREE.WebGLRenderer({ antialias: true });
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth/2, window.innerHeight/2);
+			document.body.appendChild(renderer.domElement);
+
+			renderer.outputEncoding = THREE.sRGBEncoding;
+			renderer.gammaOutput = true;
+			renderer.gammaFactor = 2.2;
+			renderer.shadowMap.enabled = true;
+
+			renderer2 = new THREE.WebGLRenderer();
+			renderer2.setPixelRatio(window.devicePixelRatio);
+			renderer2.setSize(window.innerWidth / 2, window.innerHeight / 2);
+			document.body.appendChild(renderer2.domElement);
+
+			renderer2.outputEncoding = THREE.sRGBEncoding;
+			renderer2.gammaOutput = true;
+			renderer2.gammaFactor = 2.2;
+			renderer2.shadowMap.enabled = true;
+
+			renderer3 = new THREE.WebGLRenderer({ antialias: true });
+			renderer3.setPixelRatio(window.devicePixelRatio);
+			renderer3.setSize(window.innerWidth / 2, window.innerHeight / 2);
+			document.body.appendChild(renderer3.domElement);
+
+			renderer3.outputEncoding = THREE.sRGBEncoding;
+			renderer3.gammaOutput = true;
+			renderer3.gammaFactor = 2.2;
+			renderer3.shadowMap.enabled = true;
+
+			renderer4 = new THREE.WebGLRenderer({ antialias: true });
+			renderer4.setPixelRatio(window.devicePixelRatio);
+			renderer4.setSize(window.innerWidth / 2, window.innerHeight / 2);
+			document.body.appendChild(renderer4.domElement);
+
+			renderer4.outputEncoding = THREE.sRGBEncoding;
+			renderer4.gammaOutput = true;
+			renderer4.gammaFactor = 2.2;
+			renderer4.shadowMap.enabled = true;
+
+			// ***** Clipping setup (renderer): *****
+			const globalPlanes = [globalPlane],
+				Empty = Object.freeze([]);
+			renderer.clippingPlanes = [localPlane2]; // GUI sets it to globalPlanes
+			renderer.localClippingEnabled = true;
+
+			renderer2.clippingPlanes = [localPlane]; // GUI sets it to globalPlanes
+			renderer2.localClippingEnabled = true;
+
+			renderer3.clippingPlanes = [localPlane4]; // GUI sets it to globalPlanes
+			renderer3.localClippingEnabled = true;
+
+			renderer4.clippingPlanes = [localPlane3]; // GUI sets it to globalPlanes
+			renderer4.localClippingEnabled = true;
+
+		}
+
+		
+		function animate() {
+
+			requestAnimationFrame(animate);
+
+			let newMouse = {
+				x: map_range(mouse.x, -1, 0, -1, 1),
+				y: map_range(mouse.y, 0, 1, -1, 1)
+			}
+
+			raycaster.setFromCamera( newMouse, camera );
+				const intersects = raycaster.intersectObjects( stickyNoteArray );
+				if ( intersects.length > 0 ) {
+					INTERSECTED = intersects[ 0 ].object;
+					console.log(INTERSECTED)
+
+					if(INTERSECTED && INTERSECTED.userData){
+						if(INTERSECTED.position.z < 0){
+							let myEmotion = "😕"
+							if(INTERSECTED.userData.emotion === "neutrala"){
+								myEmotion = "🤔"
+							}else if(INTERSECTED.userData.emotion === "positivea"){
+								myEmotion = "😃"
+							}
+							let mySplitUsername = INTERSECTED.userData.name.split("-")
+							let mySplitUsername1 = mySplitUsername[0]
+							let myString = "<strong>" + mySplitUsername1 + "</strong>" + ": " + INTERSECTED.userData.comment + " " + myEmotion;
+							document.getElementById("info").innerHTML = myString;
+						}
+					}
+				}
+
+				let newMouse2 = {
+				x: map_range(mouse.x, 0, 1, -1, 1),
+				y: map_range(mouse.y, 0, 1, -1, 1)
+			}
+
+			raycaster2.setFromCamera( newMouse2, camera2 );
+				const intersects2 = raycaster2.intersectObjects( stickyNoteArray );
+				if ( intersects2.length > 0 ) {
+					INTERSECTED = intersects2[ 0 ].object;
+					console.log(INTERSECTED)
+
+					if(INTERSECTED && INTERSECTED.userData){
+						if(INTERSECTED.position.x < 0){
+							let myEmotion = "😕"
+							if(INTERSECTED.userData.emotion === "neutrala"){
+								myEmotion = "🤔"
+							}else if(INTERSECTED.userData.emotion === "positivea"){
+								myEmotion = "😃"
+							}
+							let mySplitUsername = INTERSECTED.userData.name.split("-")
+							let mySplitUsername1 = mySplitUsername[0]
+							let myString = "<strong>" + mySplitUsername1 + "</strong>" + ": " + INTERSECTED.userData.comment + " " + myEmotion;
+							document.getElementById("info").innerHTML = myString;
+						}
+					}
+				}
+
+				let newMouse3 = {
+				x: map_range(mouse.x, -1, 0, -1, 1),
+				y: map_range(mouse.y, -1, 0, -1, 1)+0.035
+			}
+
+			raycaster3.setFromCamera( newMouse3, camera3 );
+				const intersects3 = raycaster3.intersectObjects( stickyNoteArray );
+				if ( intersects3.length > 0 ) {
+					INTERSECTED = intersects3[ 0 ].object;
+					console.log(INTERSECTED)
+
+					if(INTERSECTED && INTERSECTED.userData){
+						if(INTERSECTED.position.z > 0){
+							let myEmotion = "😕"
+							if(INTERSECTED.userData.emotion === "neutrala"){
+								myEmotion = "🤔"
+							}else if(INTERSECTED.userData.emotion === "positivea"){
+								myEmotion = "😃"
+							}
+							let mySplitUsername = INTERSECTED.userData.name.split("-")
+							let mySplitUsername1 = mySplitUsername[0]
+							let myString = "<strong>" + mySplitUsername1 + "</strong>" + ": " + INTERSECTED.userData.comment + " " + myEmotion;
+							document.getElementById("info").innerHTML = myString;
+						}
+					}
+				}
+
+				let newMouse4 = {
+				x: map_range(mouse.x, 0, 1, -1, 1),
+				y: map_range(mouse.y, -1, 0, -1, 1)+0.035
+			}
+
+			raycaster4.setFromCamera( newMouse4, camera4 );
+				const intersects4 = raycaster4.intersectObjects( stickyNoteArray );
+				if ( intersects4.length > 0 ) {
+					INTERSECTED = intersects4[ 0 ].object;
+					console.log(INTERSECTED)
+
+					if(INTERSECTED && INTERSECTED.userData){
+						if(INTERSECTED.position.x > 0){
+							let myEmotion = "😕"
+							if(INTERSECTED.userData.emotion === "neutrala"){
+								myEmotion = "🤔"
+							}else if(INTERSECTED.userData.emotion === "positivea"){
+								myEmotion = "😃"
+							}
+							let mySplitUsername = INTERSECTED.userData.name.split("-")
+							let mySplitUsername1 = mySplitUsername[0]
+							let myString = "<strong>" + mySplitUsername1 + "</strong>" + ": " + INTERSECTED.userData.comment + " " + myEmotion;
+							document.getElementById("info").innerHTML = myString;
+						}
+					}
+				}
+
+
+			const position = new THREE.Vector3();
+		
+
+
+			// camera.position.x = -(((cursor.x / window.innerWidth)/2) - 0.25)
+			// camera.position.y = -((cursor.y / window.innerHeight) - 0.5)
+
+			// camera2.position.z = (((cursor.x / window.innerWidth)/2) - 0.25)
+			// camera2.position.y = -((cursor.y / window.innerHeight) - 0.5)
+
+			// camera3.position.x = (((cursor.x / window.innerWidth)/2) - 0.25)
+			// camera3.position.y = -((cursor.y / window.innerHeight) - 0.5)
+
+			// camera4.position.z = -(((cursor.x / window.innerWidth)/2) - 0.25)
+			// camera4.position.y = -((cursor.y / window.innerHeight) - 0.5)
+
+
+			camera.lookAt(scene.position);
+			camera2.lookAt(scene.position);
+
+			camera3.lookAt(scene.position);
+			camera4.lookAt(scene.position);
+
+			renderer.render(scene, camera);
+			renderer2.render(scene, camera2);
+
+			renderer3.render(scene, camera3);
+			renderer4.render(scene, camera4);
+
+		}
+
+		
+
+	</script>
+
+</body>
+
+</html>
