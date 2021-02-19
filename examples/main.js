@@ -46,6 +46,12 @@ import * as THREE from '../build/three.module.js';
 		let commentToShow = "";
 		let addTextToMouse = false;
 
+		// let colorBy = true //true = comment emotion, false = department
+
+		const raycaster = new THREE.Raycaster();
+		// const rayOrigin = new THREE.Vector3(- 3, 0, 0)
+		let rayDirection = new THREE.Vector3(10, 0, 0)
+
 		//DEFINE CLASS
 
 		class PickHelper {
@@ -84,7 +90,7 @@ import * as THREE from '../build/three.module.js';
 					const intersectedStickyObjects = this.raycaster.intersectObjects(stickyNoteObjects);
 					if(intersectedStickyObjects.length == 1){
 						let stickyData = intersectedStickyObjects[0].object.userData
-						console.log("hoveringOverASticky "+ stickyData.comment);
+						console.log("hoveringOverASticky "+ intersectedStickyObjects[0].object.material.opacity); //.comment
 						currentlyHoveringOverSticky = true;
 						// currentCircle = nameOfCircle;
 						hoverStickyNote.material.opacity = 0.0
@@ -148,6 +154,8 @@ import * as THREE from '../build/three.module.js';
 
 		let stickyNoteArray = [];
 
+		let gltfLoaded = false;
+
 
 
 		init();
@@ -162,7 +170,7 @@ import * as THREE from '../build/three.module.js';
 				labelText = document.getElementById('label')
 			scene = new THREE.Scene();
 
-			camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1100);
+			camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.05, 600);
     }
 
       //CREATE THE 3 PANO GEOMETRY
@@ -248,6 +256,7 @@ import * as THREE from '../build/three.module.js';
 				});
 				scene.add(gltf.scene);
 				animate();
+				gltfLoaded = true;
 			});
 
 			//FIREBASE GET
@@ -277,7 +286,7 @@ import * as THREE from '../build/three.module.js';
 
 						cube = new THREE.Mesh(
 							new THREE.CubeGeometry(0.1, 0.1, 0.01),
-							new THREE.MeshBasicMaterial({ color: 0x0000FF }),
+							new THREE.MeshBasicMaterial({ color: 0x173F5F, transparent: true, opacity:1.0 }),
 						);
 
 						cube.lookAt(nurseData[i][j].vec.x, nurseData[i][j].vec.z, nurseData[i][j].vec.y)
@@ -297,9 +306,9 @@ import * as THREE from '../build/three.module.js';
 						}else if(nurseData[i][j].emo == "neutrala"){
 							cube.material.color = new THREE.Color(0x00FF00);
 						}else{
-							cube.material.color = new THREE.Color(0x0000FF);
+							cube.material.color = new THREE.Color(0x173F5F);
 						}
-						console.log(cube.material)
+						// console.log(cube.material)
 
 						stickyNoteArray.push(cube)
 						stickyNoteObjects.push(cube)
@@ -309,7 +318,8 @@ import * as THREE from '../build/three.module.js';
 						scene.add(cube)
 					}
 				}
-				console.log(nurseData)
+				// scene.add(stickyNoteArray)
+				// console.log(nurseData)
 
 				
 				
@@ -516,6 +526,51 @@ import * as THREE from '../build/three.module.js';
 
 		function update() {
 
+			if(gltfLoaded){
+
+				for(let i=0;i<stickyNoteArray.length;i++){
+
+					let tempArray = [];
+					for(let j = 0; j < pickableMeshes.length; j++){
+						tempArray.push(pickableMeshes[j]);
+					}
+					tempArray.push(stickyNoteObjects[i])
+
+					// console.log(tempArray)
+					let rayDirection = new THREE.Vector3(stickyNoteArray[i].position.x - camera.position.x, stickyNoteArray[i].position.y - camera.position.y, stickyNoteArray[i].position.z - camera.position.z);
+					// console.log(rayDirection)
+					rayDirection.normalize()
+					raycaster.set(camera.position, rayDirection)
+					
+					let interectionObjs = raycaster.intersectObjects(tempArray)
+					if(interectionObjs.length > 0){
+						// console.log(interectionObjs)
+						if(interectionObjs[0].object.userData.hasOwnProperty("emotion")){
+							stickyNoteArray[i].material.opacity = 1.0;
+							if(colorBy){
+								if(interectionObjs[0].object.userData.emotion == "positvea"){
+									stickyNoteArray[i].material.color = new THREE.Color(0x3CAEA3)
+								}else if(interectionObjs[0].object.userData.emotion == "neutrala"){
+									stickyNoteArray[i].material.color = new THREE.Color(0xF6D55C)
+								}else{
+									stickyNoteArray[i].material.color = new THREE.Color(0xED553B)
+								}
+								
+							}else{
+								stickyNoteArray[i].material.color = new THREE.Color(0x20639B)
+							}
+						}else{
+							stickyNoteArray[i].material.opacity = 0.1;
+							stickyNoteArray[i].material.color = new THREE.Color(0x000000)
+							// console.log(interectionObjs[0])
+						}
+					}
+					
+				}
+	
+			}
+
+
 			if(currentCameraPosition == 0){
 				camera.position.set(0.556, 0.026, -1.298)
 
@@ -673,6 +728,7 @@ import * as THREE from '../build/three.module.js';
 		// window.addEventListener('mouseleave', clearPickPosition);
 		// document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 		window.addEventListener('dblclick', onDocumentMouseDown, false);
+		window.addEventListener('click', onDocumentMouseClick, false);
 
 
 		// window.addEventListener('touchstart', (event) => {
@@ -703,6 +759,27 @@ import * as THREE from '../build/three.module.js';
 			// console.log(cursor)
 		})
 
+		function onDocumentMouseClick(event) {
+			// doClickOnRelease = true;
+			// clickedObjectNormal = objectNormal;
+
+			// if(hasEnteredScene){
+			// 	rotateCamera = false;
+			// 	console.log("hello")
+			// }
+
+			if(currentlyHoveringOverCircle){
+				currentCameraPosition = currentCircle;
+				hoverStickyNote.material.opacity = 0.0
+			}else{
+				hoverStickyNote.material.opacity = 1.0
+// if (currentlyHoveringOverAnObject && doClickOnRelease) {
+			// console.log("click")
+
+
+		}
+	}
+
 		function onDocumentMouseDown(event) {
 			doClickOnRelease = true;
 			clickedObjectNormal = objectNormal;
@@ -725,7 +802,7 @@ import * as THREE from '../build/three.module.js';
 
 			const cube = new THREE.Mesh(
 				new THREE.CubeGeometry(0.1, 0.1, 0.01),
-				new THREE.MeshBasicMaterial({ color: 0x0000FF }),
+				new THREE.MeshBasicMaterial({ color: 0x173F5F }),
 			);
 
 			if (!nameOfObject.startsWith('comment')) {

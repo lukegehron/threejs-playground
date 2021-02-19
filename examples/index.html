@@ -443,6 +443,8 @@ Replace `href` with `button,[href],select,textarea,input:not([type="hidden"]),[t
 
 		let scene;
 
+		let colorBy = true;
+
 		let listOfClickedObjects = []
 		let commentBalls = []
 		let userText = []
@@ -459,6 +461,14 @@ Replace `href` with `button,[href],select,textarea,input:not([type="hidden"]),[t
 
 		let currentCameraPosition = 0;
 		let hasEnteredScene = false;
+
+		function colorByEmotion(){
+			colorBy = true;
+		}
+
+		function colorByDepartment(){
+			colorBy = false;
+		}
 
 		function popLastElement() {
 			scene.remove(commentBalls[commentBalls.length - 1])
