@@ -116,6 +116,7 @@ import * as THREE from '../build/three.module.js';
 					currentPoint.z = intersectedObjects[0].point.z;
 					nameOfObject = intersectedObjects[0].object.name
 					this.pickedObject = intersectedObjects[0].object;
+					console.log(intersectedObjects[0].object.name)
 					// save its color
 					this.pickedObjectSavedMaterial = this.pickedObject.material;
 					let opaqueMaterial = this.pickedObject.material.clone()
@@ -179,12 +180,12 @@ import * as THREE from '../build/three.module.js';
 			// invert the geometry on the x-axis so that all of the faces point inward
 			geometry1.scale(- 1, 1, 1);
 
-			const texture = new THREE.TextureLoader().load('textures/equirectangular/Pano1.jpg');
+			const texture = new THREE.TextureLoader().load('textures/equirectangular/pano1-2.jpg');
 			const material = new THREE.MeshBasicMaterial({ map: texture});
 
 			pano1 = new THREE.Mesh(geometry1, material);
-			pano1.rotateY(-3.28)
-			pano1.position.set(0.556, 0.026, -1.298)
+			pano1.rotateY(-2.75)
+			pano1.position.set(-0.998, 0.026, 1.188)
 
 			scene.add(pano1);}
 			
@@ -193,12 +194,12 @@ import * as THREE from '../build/three.module.js';
 			// invert the geometry on the x-axis so that all of the faces point inward
 			geometry1.scale(- 1, 1, 1);
 
-			const texture = new THREE.TextureLoader().load('textures/equirectangular/Pano2.jpg');
+			const texture = new THREE.TextureLoader().load('textures/equirectangular/pano2-2.jpg');
 			const material = new THREE.MeshBasicMaterial({ map: texture});
 
 			pano2 = new THREE.Mesh(geometry1, material);
-			pano2.rotateY(-0.05)
-			pano2.position.set(-0.612, 0.026, 2.018)
+			pano2.rotateY(0.14)
+			pano2.position.set(0.015, 0.026, 2.336)
 
 
 			scene.add(pano2);}
@@ -210,12 +211,14 @@ import * as THREE from '../build/three.module.js';
 			// invert the geometry on the x-axis so that all of the faces point inward
 			geometry1.scale(- 1, 1, 1);
 
-			const texture = new THREE.TextureLoader().load('textures/equirectangular/Pano3.jpg');
+			const texture = new THREE.TextureLoader().load('textures/equirectangular/pano3-2.jpg');
 			const material = new THREE.MeshBasicMaterial({ map: texture});
 
 			pano3 = new THREE.Mesh(geometry1, material);
-			pano3.rotateY(3.82)
-			pano3.position.set(-1.148, 0.026, -3.57)
+			pano3.rotateY(2.45)
+			pano3.position.set(1.052, 0.026, -2.874)
+
+			
 
 
 			scene.add(pano3);}
@@ -225,15 +228,17 @@ import * as THREE from '../build/three.module.js';
 
         let circle;
 
-        circle = UTIL.drawCircles({x:0.556, y:-1.8, z:-1.298}, 0)
+				
+
+        circle = UTIL.drawCircles({x:-0.998, y:-1.8, z:-1.188}, 0)
         clickableCircles.push(circle)
         scene.add(circle)
 
-        circle = UTIL.drawCircles({x:-0.612, y:-1.8, z:2.018}, 1)
+        circle = UTIL.drawCircles({x:0.015, y:-1.8, z:2.336}, 1)
         clickableCircles.push(circle)
         scene.add(circle)
 
-        circle = UTIL.drawCircles({x:-1.148, y:-1.8, z:-3.57}, 2)
+        circle = UTIL.drawCircles({x:1.052, y:-1.8, z:-2.874}, 2)
         clickableCircles.push(circle)
         scene.add(circle)
 
@@ -243,7 +248,7 @@ import * as THREE from '../build/three.module.js';
 
 
 			const loader = new GLTFLoader().setPath('models/gltf/');
-			loader.load('cabinet15.glb', function (gltf) {
+			loader.load('residentRoom3.glb', function (gltf) {
 
 				let scale = 1.0;
 				gltf.scene.traverse(function (child) {
@@ -276,54 +281,68 @@ import * as THREE from '../build/three.module.js';
 
 			let cube;
 
-			var starCountRef = firebase.database().ref('/department-Nurse/').once('value').then(function (snapshot) {
-				// currentArrayNumM = 0;
-				let nurseData = (snapshotToArray(snapshot));
-				// console.log(nurseData)
-				for (let i = 0; i < nurseData.length; i++) {
-					for (let j = 0; j < nurseData[i].length; j++) {
-						// console.log(nurseData[i])
+			// Resident
+			// Family
+			// Staff
+			// Official
+			// Veteran
+			// Other
 
-						cube = new THREE.Mesh(
-							new THREE.CubeGeometry(0.1, 0.1, 0.01),
-							new THREE.MeshBasicMaterial({ color: 0x173F5F, transparent: true, opacity:1.0 }),
-						);
+			let depts = ["Resident", "Family", "Staff", "Official", "Veteran", "Other"]
 
-						cube.lookAt(nurseData[i][j].vec.x, nurseData[i][j].vec.z, nurseData[i][j].vec.y)
-						cube.position.x = nurseData[i][j].pos.x
-						cube.position.y = nurseData[i][j].pos.y
-						cube.position.z = nurseData[i][j].pos.z
-
-						
-						cube.userData.comment = nurseData[i][j].comment
-						cube.userData.element = nurseData[i][j].element
-						cube.userData.emotion = nurseData[i][j].emo
-						cube.userData.name = nurseData[i].key
-						// console.log(nurseData[i].key)
-
-						if(nurseData[i][j].emo == "positvea"){
-							cube.material.color = new THREE.Color(0xFF0000);
-						}else if(nurseData[i][j].emo == "neutrala"){
-							cube.material.color = new THREE.Color(0x00FF00);
-						}else{
-							cube.material.color = new THREE.Color(0x173F5F);
+			for(let l = 0; l < depts.length; l++){
+				var starCountRef = firebase.database().ref('/department-'+depts[l]+'/').once('value').then(function (snapshot) {
+					// currentArrayNumM = 0;
+					let nurseData = (snapshotToArray(snapshot));
+					// console.log(nurseData)
+					for (let i = 0; i < nurseData.length; i++) {
+						for (let j = 0; j < nurseData[i].length; j++) {
+							// console.log(nurseData[i])
+	
+							cube = new THREE.Mesh(
+								new THREE.CubeGeometry(0.1, 0.1, 0.01),
+								new THREE.MeshBasicMaterial({ color: 0x173F5F, transparent: true, opacity:1.0 }),
+							);
+	
+							cube.lookAt(nurseData[i][j].vec.x, nurseData[i][j].vec.z, nurseData[i][j].vec.y)
+							cube.position.x = nurseData[i][j].pos.x
+							cube.position.y = nurseData[i][j].pos.y
+							cube.position.z = nurseData[i][j].pos.z
+	
+							
+							cube.userData.comment = nurseData[i][j].comment
+							cube.userData.element = nurseData[i][j].element
+							cube.userData.emotion = nurseData[i][j].emo
+							cube.userData.name = nurseData[i].key
+							cube.userData.dept = depts[l];
+							// console.log(nurseData[i].key)
+	
+							if(nurseData[i][j].emo == "positvea"){
+								cube.material.color = new THREE.Color(0xFF0000);
+							}else if(nurseData[i][j].emo == "neutrala"){
+								cube.material.color = new THREE.Color(0x00FF00);
+							}else{
+								cube.material.color = new THREE.Color(0x173F5F);
+							}
+							// console.log(cube.material)
+	
+							stickyNoteArray.push(cube)
+							stickyNoteObjects.push(cube)
+	
+							
+	
+							scene.add(cube)
 						}
-						// console.log(cube.material)
-
-						stickyNoteArray.push(cube)
-						stickyNoteObjects.push(cube)
-
-						
-
-						scene.add(cube)
 					}
-				}
-				// scene.add(stickyNoteArray)
-				// console.log(nurseData)
+					// scene.add(stickyNoteArray)
+					// console.log(nurseData)
+	
+					
+					
+				})
+			}
 
-				
-				
-			})
+			
 
 			
 
@@ -550,14 +569,72 @@ import * as THREE from '../build/three.module.js';
 							if(colorBy){
 								if(interectionObjs[0].object.userData.emotion == "positvea"){
 									stickyNoteArray[i].material.color = new THREE.Color(0x3CAEA3)
+									if(checkedEmos.includes("positivea.")){
+										stickyNoteArray[i].visible = true
+									}else{
+										stickyNoteArray[i].visible = false
+									}
 								}else if(interectionObjs[0].object.userData.emotion == "neutrala"){
 									stickyNoteArray[i].material.color = new THREE.Color(0xF6D55C)
+									if(checkedEmos.includes("neutrala.")){
+										stickyNoteArray[i].visible = true
+									}else{
+										stickyNoteArray[i].visible = false
+									}
 								}else{
 									stickyNoteArray[i].material.color = new THREE.Color(0xED553B)
+									if(checkedEmos.includes("negativea.")){
+										stickyNoteArray[i].visible = true
+									}else{
+										stickyNoteArray[i].visible = false
+									}
 								}
 								
 							}else{
-								stickyNoteArray[i].material.color = new THREE.Color(0x20639B)
+								if(interectionObjs[0].object.userData.dept == "Resident"){
+									stickyNoteArray[i].material.color = new THREE.Color(0x2271b1)
+									if(checkedDepts.includes("Resident")){
+										stickyNoteArray[i].visible = true
+									}else{
+										stickyNoteArray[i].visible = false
+									}
+								}else if(interectionObjs[0].object.userData.dept == "Family"){
+									stickyNoteArray[i].material.color = new THREE.Color(0x646970)
+									if(checkedDepts.includes("Family")){
+										stickyNoteArray[i].visible = true
+									}else{
+										stickyNoteArray[i].visible = false
+									}
+								}else if(interectionObjs[0].object.userData.dept == "Staff"){
+									stickyNoteArray[i].material.color = new THREE.Color(0xd63638)
+									if(checkedDepts.includes("Staff")){
+										stickyNoteArray[i].visible = true
+									}else{
+										stickyNoteArray[i].visible = false
+									}
+								}else if(interectionObjs[0].object.userData.dept == "Official"){
+									stickyNoteArray[i].material.color = new THREE.Color(0x996b00)
+									if(checkedDepts.includes("Official")){
+										stickyNoteArray[i].visible = true
+									}else{
+										stickyNoteArray[i].visible = false
+									}
+								}else if(interectionObjs[0].object.userData.dept == "Veteran"){
+									stickyNoteArray[i].material.color = new THREE.Color(0xF6D55C)
+									if(checkedDepts.includes("Veteran")){
+										stickyNoteArray[i].visible = true
+									}else{
+										stickyNoteArray[i].visible = false
+									}
+								}else{
+									stickyNoteArray[i].material.color = new THREE.Color(0x008a20)
+									if(checkedDepts.includes("Other")){
+										stickyNoteArray[i].visible = true
+									}else{
+										stickyNoteArray[i].visible = false
+									}
+								}
+								// stickyNoteArray[i].material.color = new THREE.Color(0x20639B)
 							}
 						}else{
 							stickyNoteArray[i].material.opacity = 0.1;
@@ -570,9 +647,13 @@ import * as THREE from '../build/three.module.js';
 	
 			}
 
+			// 0.998, 0.026, -1.188
+			// 0.015, 0.026, 2.336
+			// 1.052, 0.026, -2.874
+
 
 			if(currentCameraPosition == 0){
-				camera.position.set(0.556, 0.026, -1.298)
+				camera.position.set(-0.998, 0.026, -1.188)
 
 				pano1.position.y = 0;
 				pano2.position.y = 10000;
@@ -582,14 +663,14 @@ import * as THREE from '../build/three.module.js';
 			
 
 			}else if(currentCameraPosition == 1){
-				camera.position.set(-0.612, 0.026, 2.018)
+				camera.position.set(0.015, 0.026, 2.336)
 
 				pano1.position.y = 10000;
 				pano2.position.y = 0;
 				pano3.position.y = 10000;
 
 			}else if(currentCameraPosition == 2){
-				camera.position.set(-1.148, 0.026, -3.57)
+				camera.position.set(1.052, 0.026, -2.874)
 				pano1.position.y = 10000;
 				pano2.position.y = 10000;
 				pano3.position.y = 0;
@@ -624,7 +705,7 @@ import * as THREE from '../build/three.module.js';
 			hoverStickyNote.position.y = 0
 			hoverStickyNote.position.z = 0
 			// hoverStickyNote.lookAt(objectNormal)
-			let myLookAt = new THREE.Vector3(objectNormal.x, objectNormal.z, objectNormal.y)
+			let myLookAt = new THREE.Vector3(objectNormal.x, objectNormal.y, objectNormal.z)
 			hoverStickyNote.lookAt(myLookAt)
 			hoverStickyNote.position.x = currentPoint.x
 			hoverStickyNote.position.y = currentPoint.y
@@ -808,7 +889,7 @@ import * as THREE from '../build/three.module.js';
 			if (!nameOfObject.startsWith('comment')) {
 				console.log(objectNormal)
 				cubeNumber++
-				let myLookAt = new THREE.Vector3(clickedObjectNormal.x, clickedObjectNormal.z, clickedObjectNormal.y)
+				let myLookAt = new THREE.Vector3(clickedObjectNormal.x, clickedObjectNormal.y, clickedObjectNormal.z)
 				cube.lookAt(myLookAt)
 				cube.position.x = currentPoint.x
 				cube.position.y = currentPoint.y

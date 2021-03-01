@@ -63,7 +63,7 @@ button {
   font-family: 'Montserrat', sans-serif;
   letter-spacing: -0.2px;
   font-size: 12px;
-  text-shadow: 1px 1px 0 #FFF;
+  /* text-shadow: 1px 1px 0 #FFF; */
 }
 
 div,
@@ -92,13 +92,13 @@ input {
   border-radius: 20px;
   padding: 10px;
   /* background-color: #EBECF0; */
-  text-shadow: 1px 1px 0 #FFF;
+  /* text-shadow: 1px 1px 0 #FFF; */
 }
 
 label {
-  display: block;
+  /* display: block; */
   width: 90%;
-  position: relative;
+  /* position: relative; */
   cursor: pointer;
 }
 
@@ -107,6 +107,17 @@ label {
 }
 
 input {
+  margin-right: 4px;
+
+  /* box-shadow: inset 2px 2px 5px #BABECC, inset -5px -5px 10px #FFF; */
+  width: 80%;
+  box-sizing: border-box;
+  /* transition: all 0.2s ease-in-out;
+  appearance: none; */
+  /* -webkit-appearance: none; */
+}
+
+input[type="radio"] {
   margin-right: 4px;
 
   box-shadow: inset 2px 2px 5px #BABECC, inset -5px -5px 10px #FFF;
@@ -126,7 +137,7 @@ input[type="submit"] {
   color: #61677C;
   font-weight: bold;
   box-shadow: -5px -5px 20px #FFF, 5px 5px 20px #BABECC;
-  transition: all 0.2s ease-in-out;
+  /* transition: all 0.2s ease-in-out; */
   cursor: pointer;
   font-weight: 400;
 }
@@ -148,6 +159,7 @@ ul {
   flex-wrap: wrap;
   border-radius: 20px;
   padding: 12px;
+  width: 90%;
   /* background: #EBECF0; */
   box-shadow: inset 2px 2px 5px #BABECC, inset -5px -5px 10px #FFF;
 }
@@ -162,11 +174,28 @@ li {
 
 
 input[type="checkbox"] {
-  position: absolute;
-  opacity: 0;
+  /* position: absolute; */
+  display: block;
+  /* opacity: 0; */
+  margin:5px;
+  padding: 0px;
+  margin-left: -15px;
+  margin-top: -15px;
+  
+  width:10px;
+  /* background-color:#005075 !important; */
 }
 
-input:checked~.icon-box {
+.colorBox{
+  display: block;
+  margin:5px;
+  padding: 0px;
+  margin-left: -30px;
+  margin-top: -16px;
+  width:10px;
+}
+
+ input:checked~.icon-box {
   box-shadow: inset -2px -2px 5px rgba(255, 255, 255, 1),
     inset 3px 3px 5px rgba(0, 0, 0, 0.1);
 }
@@ -175,7 +204,6 @@ input:checked~.icon-box {
 .icon-box {
   width: 60px;
   height: 60px;
-  /* background: #EBECF0; */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -288,8 +316,8 @@ input {
   border-radius: 12px;
   padding: 6px;
   /* background-color: #EBECF0; */
-  text-shadow: 1px 1px 0 #FFF;
-  background-color: #FFF !important;
+  /* text-shadow: 1px 1px 0 #FFF; */
+  /* background-color: #FFF !important; */
 }
 
 button {
@@ -327,6 +355,7 @@ select {
   --i-close: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" fill="none"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>');
   /* background-color: rgba(255, 255, 255, .1); */
   background-image: linear-gradient(0deg, #005075 0%, #0073a8 100%);
+  /* background-color: rgba(220,26,85,1); */
   z-index: 503;
 /* mix-blend-mode: multiply; */
 
@@ -414,6 +443,13 @@ select {
   gap: 1rem;
   margin-block-start: 1rem;
 }
+.c-modal__nav2 {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-block-start: 1rem;
+}
 
 .c-modal__content {
   min-height: 60px;
@@ -456,9 +492,10 @@ table {
 } */
 .nav-bar {
   background: linear-gradient(180deg, #005075, #0073a8);
+  /* background: rgba(220,26,85,1); */
   height: 90px;
   z-index: 600;
-  background-color: white;
+  /* background-color: white; */
   /* position: absolute; */
   /* margin-bottom: 15px; */
 }
@@ -512,43 +549,45 @@ table {
 .sidenav a {
   padding: 8px 8px 8px 8px;
   text-decoration: none;
-  font-size: 25px;
+  font-size: 22px;
   color: #818181;
   display: block;
   transition: 0.3s;
   width: 100%;
   margin: auto;
   text-align: center;
+  margin-top: -5px;
 }
 
 .sidenav2 a {
-  /* padding: 8px 8px 8px 32px; */
+  padding: 8px 8px 8px 8px;
   text-decoration: none;
-  font-size: 25px;
+  font-size: 22px;
   color: #818181;
   display: block;
   transition: 0.3s;
   width: 100%;
   margin: auto;
   text-align: center;
+  margin-top: -5px;
 }
 
 /* When you mouse over the navigation links, change their color */
-.sidenav a:hover {
+/* .sidenav a:hover {
   color: #f1f1f1;
-}
+} */
 
 /* Position and style the close button (top right corner) */
-.sidenav .closebtn {
+/* .sidenav .closebtn {
   position: absolute;
   top: 0;
-  font-size: 22px;
+  font-size: 22px; */
   /* right: 25px; */
   /* font-size: 36px; */
   /* margin-left: 50px; */
   /* margin-left:30px; */
-  text-align: center;
-}
+  /* text-align: center;
+} */
 
 /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
 #main {
@@ -600,6 +639,7 @@ z-index:600;
 content:'';
 opacity: 1;
 background-image: linear-gradient(0deg, #005075 0%, #0073a8 100%);
+/* background-color: rgba(220,26,85,1); */
 /* mix-blend-mode: multiply; */
 height: 100%;
 width: 100%;
@@ -662,6 +702,7 @@ background-image: none;
 }
 .btn:hover {
 background: #0073a8;
+/* background: rgba(220,26,85,1); */
 -webkit-box-shadow: 0 11px 20px 0 rgba(0, 0, 0, 0.2);
 
 box-shadow: 0 11px 20px 0 rgba(0, 0, 0, 0.2);
