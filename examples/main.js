@@ -117,6 +117,10 @@ import * as THREE from '../build/three.module.js';
 					nameOfObject = intersectedObjects[0].object.name
 					this.pickedObject = intersectedObjects[0].object;
 					console.log(intersectedObjects[0].object.name)
+
+					if (labelText.innerHTML == ""){
+						labelText.innerHTML = intersectedObjects[0].object.name
+					}
 					// save its color
 					this.pickedObjectSavedMaterial = this.pickedObject.material;
 					let opaqueMaterial = this.pickedObject.material.clone()
@@ -304,7 +308,7 @@ import * as THREE from '../build/three.module.js';
 								new THREE.MeshBasicMaterial({ color: 0x173F5F, transparent: true, opacity:1.0 }),
 							);
 	
-							cube.lookAt(nurseData[i][j].vec.x, nurseData[i][j].vec.z, nurseData[i][j].vec.y)
+							cube.lookAt(nurseData[i][j].vec.x, nurseData[i][j].vec.y, nurseData[i][j].vec.z)
 							cube.position.x = nurseData[i][j].pos.x
 							cube.position.y = nurseData[i][j].pos.y
 							cube.position.z = nurseData[i][j].pos.z
