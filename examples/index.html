@@ -52,6 +52,24 @@
 			return firebase.database().ref().update(updates);
 		}
 
+		function writeNewUser(dept, count) {
+			var postData = {
+				count: count
+			};
+
+			firebase.database().ref('/dept-' + dept + '/' + 0).child('count').set(firebase.database.ServerValue.increment(1));
+			
+			// var newPostKey = firebase.database().ref().child('posts').push().key;
+			
+
+			
+
+			// var updates = {};
+			// updates['/dept-' + dept + '/' + 0] = postData;
+
+			// return firebase.database().ref().update(updates);
+		}
+
 	</script>
 
 	<!-- MODAL SCRIPT -->
@@ -133,28 +151,29 @@ Replace `href` with `button,[href],select,textarea,input:not([type="hidden"]),[t
 	<!-- SPLASHSCREEN -->
 	<section class="splash" id="splash">
 		<div class="splash_inner" id="splash1">
-			<h1 class="text-focus-in" style="text-align: left; margin-left: 0px; font-size: 7vw;">Holyoke Resident Room</h1>
+			<h1 class="text-focus-in" style="text-align: left; margin-left: 0px; font-size: 7vw;"></h1>
 			<p class="text-focus-in" style='font-family: "NonBreakingSpaceOverride", "Hoefler Text", "Baskerville Old Face", Garamond, "Times New Roman", serif;
-				font-size: 2.6rem;
-					line-height: 2.8rem;
+				font-size: 4.0rem;
+					line-height: 4.2rem;
 				color: white;
 				margin-bottom: 4rem;
-					max-width: 700px;'>An interactive virtual mock-up of the proposed Soldier's Home in Holyoke.</p>
-			<div class="btn slide-in-bottom" onclick="closeSplash()">
-				<a>Explore</a>
+					max-width: 900px;'>Welcome to the Soldiers’ Home in Holyoke Virtual Resident Room.</p>
+			<div class="btn slide-in-bottom" onclick="closeSplash()" style="width: 400px;">
+				<a>Explore and Provide Feedback</a>
 			</div>
 		</div>
 	</section>
 
 	<!-- TOP TITLE BAR -->
 	<div class="nav-bar">
-		<button style="display: sticky; margin: 30px; float: left; position: absolute; z-index: 100;" onclick="openNav()"><i
+		<button style="display: sticky; margin: 30px; float: left; position: absolute; z-index: 100; padding: 12px" onclick="openNav()"><i
 				class="fas fa-bars"></i> &nbsp; Settings</button>
 		<h1
-			style="color: white; font-size: 4em; width: 100%; margin:auto; margin-top: 0px; position: absolute; text-align: center; line-height: 5rem;">
-			Holyoke Resident Room</h1>
+			style="color: white; font-size: 4em; width: 100%; margin:auto; margin-top: -14px; position: absolute; text-align: center; line-height: 5rem;">
+			Resident Room</h1> 	<h1
+			style="color: white; font-size: 2.3em; width: 100%; margin:auto; margin-top: 28px; position: absolute; text-align: center; line-height: 5rem;">Soldiers’ Home in Holyoke</h1>
 		<!-- <span onclick="openNav()">Sidebar</span> -->
-		<button style="right:0px; margin: 30px; float: right; position: absolute; z-index: 100;" onclick="openNav2()">
+		<button style="right:0px; margin: 30px; float: right; position: absolute; z-index: 100; padding: 12px" onclick="openNav2()">
 			How to Use &nbsp; <i class="far fa-question-circle"></i></button>
 				
 	</div>
@@ -464,12 +483,13 @@ Replace `href` with `button,[href],select,textarea,input:not([type="hidden"]),[t
 						</td>
 						<td style="width: 60%;">
 							<!-- <input type="text" id="userText" style="width: 100%;"> -->
-							<textarea id="userText" rows="4" cols="50" style="width: 95%; border-radius: 1rem;"></textarea>
+							<textarea id="userText" rows="4" cols="50" style="width: 95%; border-radius: 1rem;" maxlength="240"></textarea>
 						</td>
 
 					</tr>
 				</table>
 			</div>
+			<p>max comment length: 240 characters. To leave a more detailed comment, please contact info@email.com</p>
 
 			<div class="c-modal__nav">
 
@@ -613,6 +633,8 @@ Replace `href` with `button,[href],select,textarea,input:not([type="hidden"]),[t
 			console.log(document.getElementById("username").value)
 			location.hash = 'instructions'
 			hasEnteredScene = true;
+			//add firebase sender
+			writeNewUser(dept[0], 1)
 			
 			// setTimeout(function(){ openNav(); }, 1000);
 

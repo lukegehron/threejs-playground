@@ -197,7 +197,7 @@ import * as THREE from '../build/three.module.js';
 			// invert the geometry on the x-axis so that all of the faces point inward
 			geometry1.scale(- 1, 1, 1);
 
-			const texture = new THREE.TextureLoader().load('textures/equirectangular/pano1-5.jpg');
+			const texture = new THREE.TextureLoader().load('textures/equirectangular/pano1-9.jpg');
 			const material = new THREE.MeshBasicMaterial({ map: texture});
 
 			pano1 = new THREE.Mesh(geometry1, material);
@@ -211,7 +211,7 @@ import * as THREE from '../build/three.module.js';
 			// invert the geometry on the x-axis so that all of the faces point inward
 			geometry1.scale(- 1, 1, 1);
 
-			const texture = new THREE.TextureLoader().load('textures/equirectangular/pano2-5.jpg');
+			const texture = new THREE.TextureLoader().load('textures/equirectangular/pano2-9.jpg');
 			const material = new THREE.MeshBasicMaterial({ map: texture});
 
 			pano2 = new THREE.Mesh(geometry1, material);
@@ -228,7 +228,7 @@ import * as THREE from '../build/three.module.js';
 			// invert the geometry on the x-axis so that all of the faces point inward
 			geometry1.scale(- 1, 1, 1);
 
-			const texture = new THREE.TextureLoader().load('textures/equirectangular/pano3-5.jpg');
+			const texture = new THREE.TextureLoader().load('textures/equirectangular/pano3-7.jpg');
 			const material = new THREE.MeshBasicMaterial({ map: texture});
 
 			pano3 = new THREE.Mesh(geometry1, material);
@@ -247,15 +247,15 @@ import * as THREE from '../build/three.module.js';
 
 				
 
-        circle = UTIL.drawCircles({x:-0.998, y:-1.8, z:-1.188}, 0)
+        circle = UTIL.drawCircles({x:-0.998, y:-1.5, z:-1.188}, 0)
         clickableCircles.push(circle)
         scene.add(circle)
 
-        circle = UTIL.drawCircles({x:0.015, y:-1.8, z:2.336}, 1)
+        circle = UTIL.drawCircles({x:0.015, y:-1.5, z:2.336}, 1)
         clickableCircles.push(circle)
         scene.add(circle)
 
-        circle = UTIL.drawCircles({x:1.052, y:-1.8, z:-2.874}, 2)
+        circle = UTIL.drawCircles({x:1.052, y:-1.5, z:-2.874}, 2)
         clickableCircles.push(circle)
         scene.add(circle)
 
@@ -265,7 +265,7 @@ import * as THREE from '../build/three.module.js';
 
 
 			const loader = new GLTFLoader().setPath('models/gltf/');
-			loader.load('residentRoom8.glb', function (gltf) {
+			loader.load('residentRoom9.glb', function (gltf) {
 
 				let scale = 1.0;
 				gltf.scene.traverse(function (child) {
