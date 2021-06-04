@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>LSU Teaching Lab Mockup</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="style.css">
+
+	<script src="https://www.gstatic.com/firebasejs/7.15.3/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/7.15.3/firebase-database.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+		integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w=="
+		crossorigin="anonymous" />
+
+	<!-- FIREBASE SCRIPT -->
+	<script>
+		// Your web app's Firebase configuration
+		var firebaseConfig = {
+			apiKey: "AIzaSyAO2O2T1N8FC5f2vJ55EVhPFkQL9HXRjSs",
+			authDomain: "codetracker-5db3d.firebaseapp.com",
+			databaseURL: "https://codetracker-5db3d.firebaseio.com",
+			projectId: "codetracker-5db3d",
+			storageBucket: "codetracker-5db3d.appspot.com",
+			messagingSenderId: "500210027842",
+			appId: "1:500210027842:web:ff21b1b596fd063c"
+		};
+		// Initialize Firebase
+		firebase.initializeApp(firebaseConfig);
+
+		var database = firebase.database();
+
+		function writeNewPost(name, posObject, emotion, comment, dept, elementName, deleted, index, vector) {
+			var postData = {
+				pos: posObject,
+				comment: comment,
+				emo: emotion,
+				element: elementName,
+				show: deleted,
+				vec: vector
+			};
+
+			var newPostKey = firebase.database().ref().child('posts').push().key;
+
+			var updates = {};
+			updates['/department-' + dept + '/' + name + '/' + index] = postData;
+
+			return firebase.database().ref().update(updates);
+		}
+
+		function writeNewUser(dept, count) {
+			var postData = {
+				count: count
+			};
+
+			firebase.database().ref('/dept-' + dept + '/' + 0).child('count').set(firebase.database.ServerValue.increment(1));
+			
+		}
+
+	</script>
+
+	<!-- MODAL SCRIPT -->
+	<script>/*
+Basic :focus-trapping in 556 bytes before gzip.
+Replace `href` with `button,[href],select,textarea,input:not([type="hidden"]),[tabindex]:not([tabindex="-1"])` for supporting all focusable elements.
+*/
+		let D = document;
+		function K(e) {
+			if ("Tab" === e.key) {
+				e.preventDefault();
+				let t = this.__f.length - 1, n = this.__f.indexOf(e.target);
+				(n = e.shiftKey ? n - 1 : n + 1) < 0 && (n = t), n > t && (n = 0), this.__f[n].focus()
+			}
+			"Escape" === e.key && (location.hash = "#")
+		}
+		addEventListener("hashchange", e => {
+			let t = location.hash;
+			if (t.length > 1) {
+				let e = D.getElementById(t.substr(1));
+				e && (e.addEventListener("keydown", K), e.__f = [...e.querySelectorAll('[href]')], e.__f[0].focus())
+			} else {
+				let [t, n] = e.oldURL.split("#");
+				n && (D.getElementById(n).removeEventListener("keydown", K), D.querySelector(`[href="#${n}"]`).focus())
+			}
+		})
+
+		/* DEMO: Trigger open */
+		// location.hash = "login"
+	</script>
+
+	<!-- SIDEBAR SCRIPT -->
+	<script>
+		/* Set the width of the side navigation to 250px and the left margin of the page content to 250px and add a black background color to body */
+		function openNav() {
+			document.getElementById("mySidenav").style.width = "250px";
+			// document.getElementById("container").style.marginLeft = "250px";
+			document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
+		}
+
+		/* Set the width of the side navigation to 0 and the left margin of the page content to 0, and the background color of body to white */
+		function closeNav() {
+			document.getElementById("mySidenav").style.width = "0";
+			document.getElementById("container").style.marginLeft = "0";
+			document.body.style.backgroundColor = "white";
+		}
+
+		function openNav2() {
+			document.getElementById("mySidenav2").style.width = "250px";
+			// document.getElementById("container").style.marginLeft = "250px";
+			document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
+		}
+
+		function closeNav2() {
+			document.getElementById("mySidenav2").style.width = "0";
+			document.getElementById("container2").style.marginRight = "0";
+			document.body.style.backgroundColor = "white";
+		}
+
+		function closeSplash() {
+			document.getElementById("splash").style.height = "0px";
+			document.getElementById("splash").style.display = "none";
+			document.getElementById("splash1").style.display = "none";
+			location.hash = "login"
+
+		closeNav()
+		closeNav2()
+
+		}
+
+	</script>
+
+</head>
+
+<body>
+
+	
+
+	<!-- SPLASHSCREEN -->
+	<section class="splash" id="splash">
+		<div class="splash_inner" id="splash1">
+			<h1 class="text-focus-in" style="text-align: left; margin-left: 0px; font-size: 7vw;"></h1>
+			<p class="text-focus-in" style='font-family: "NonBreakingSpaceOverride", "Hoefler Text", "Baskerville Old Face", Garamond, "Times New Roman", serif;
+				font-size: 4.0rem;
+					line-height: 4.2rem;
+				color: white;
+				margin-bottom: 4rem;
+					max-width: 900px;'>Welcome to the LSU Teaching Lab Design Tool.</p>
+			<div class="btn slide-in-bottom" onclick="closeSplash()" style="width: 400px;">
+				<a>Explore and Provide Feedback</a>
+			</div>
+		</div>
+	</section>
+
+	<!-- TOP TITLE BAR -->
+	<div class="nav-bar">
+		<button style="display: sticky; margin: 30px; float: left; position: absolute; z-index: 100; padding: 12px" onclick="openNav()"><i
+				class="fas fa-bars"></i> &nbsp; Settings</button>
+		<h1
+			style="color: white; font-size: 4em; width: 100%; margin:auto; margin-top: -14px; position: absolute; text-align: center; line-height: 5rem;">
+			Teaching Lab</h1> 	<h1
+			style="color: white; font-size: 2.3em; width: 100%; margin:auto; margin-top: 28px; position: absolute; text-align: center; line-height: 5rem;">LSU</h1>
+		<!-- <span onclick="openNav()">Sidebar</span> -->
+		<button style="right:0px; margin: 30px; float: right; position: absolute; z-index: 100; padding: 12px" onclick="openNav2()">
+			How to Use &nbsp; <i class="far fa-question-circle"></i></button>
+				
+	</div>
+
+	<h2 class="hoverContent" id="label" style="position: fixed; text-align: center; top:15vh; width: 100%; margin: auto; z-index: 500;"></h2>
+
+	<!-- SETTINGS SIDEBAR -->
+	<div id="mySidenav" class="sidenav" style="z-index: 200; width:250px; background-color: rgba(255, 255, 255, 1); ">
+		<!-- <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a> -->
+		<div id="overlay" style="width:36%; display: inline-block; margin: auto;">
+			<!-- <div id="app" -->
+			<!-- style="top:0px; height:100%; position: absolute; width:100%; background-color: rgba(255, 255, 255, 1) !important;
+			z-index: 5;"> -->
+
+			<div
+				style="top:0px; height:100%; position: absolute; background-color: rgba(255, 255, 255, 1) !important; z-index: 5;">
+
+
+
+			<button style="margin-left: 10%; width: 80%; height: 40px;"><a href="javascript:void(0)" class="closebtn" onclick="closeNav()">HIDE SETTINGS</a></button><br><br>
+			
+			<h2 style="text-align: center; width: 100%;"> Settings:</h2>
+		
+			
+			<div style="margin: 5px;">
+				
+				
+
+			<div id="app">
+				<div>
+					<h3>Filter Comments</h3>
+					<ul>
+						<li>
+							<b style="font-size: larger;">Color Sticky by:</b>
+						</li>
+						<li>
+							<button onclick="colorByDepartment()" style="font-size:1em; min-width:100%;"><a style="margin: 0; font-size: 1.2em;">User Department</a></button>
+						</li>
+						<li>
+							<label for="Resident">Student &nbsp; </label> 
+							<input type="checkbox" id="Resident" value="Resident" v-model="checkedDepartments" v-on:click="updateDepts('Resident')">
+							<span class="colorBox" style="background-color: #2271b1; height: 10px;"> &nbsp;</span>
+							<label for="Family">Faculty  &nbsp; </label>
+							<input type="checkbox" id="Family" value="Family" v-model="checkedDepartments" v-on:click="updateDepts('Family')">
+							<span class="colorBox" style="background-color: #646970; height: 10px;"> &nbsp;</span>
+							<label for="Staff">Staff  &nbsp; </label>
+							<input type="checkbox" id="Staff" value="Staff" v-model="checkedDepartments" v-on:click="updateDepts('Staff')">
+							<span class="colorBox" style="background-color: #d63638; height: 10px;"> &nbsp;</span>
+							<label for="Official">Official  &nbsp; </label>
+							<input type="checkbox" id="Official" value="Official" v-model="checkedDepartments" v-on:click="updateDepts('Official')">
+							<span class="colorBox" style="background-color: #996b00; height: 10px;"> &nbsp;</span>
+							<label for="Veteran">Alumni &nbsp; </label>
+							<input type="checkbox" id="Veteran" value="Veteran" v-model="checkedDepartments" v-on:click="updateDepts('Veteran')">
+							<span class="colorBox" style="background-color: #F6D55C; height: 10px;"> &nbsp;</span>
+							<label for="Other">Other  &nbsp; </label>
+							<input type="checkbox" id="Other" value="Other" v-model="checkedDepartments" v-on:click="updateDepts('Other')">
+							<span class="colorBox" style="background-color: #008a20; height: 10px;"> &nbsp;</span>
+							
+							<!-- <br>
+							<span>Checked names: {{ checkedDepartments }}</span> -->
+						</li>
+						<li>
+							<button onclick="colorByEmotion()" style="font-size:1em"><a style="margin: 0; font-size: 1.2em;">Comment Sentiment</a></button>
+						</li>
+						<li>
+							<label for="positive">Positive &nbsp; </label>
+							<input type="checkbox" id="positive" value="positivea." v-model="checkedEmotions" v-on:click="updateEmotions('positiva.')">
+							<span class="colorBox" style="background-color: #3CAEA3; height: 10px;"> &nbsp;</span>
+							<label for="neutral">Neutral  &nbsp; </label>
+							<input type="checkbox" id="neutral" value="neutrala." v-model="checkedEmotions" v-on:click="updateEmotions('neutrala.')">
+							<span class="colorBox" style="background-color: #F6D55C; height: 10px;"> &nbsp;</span>
+							<label for="negative">Negative  &nbsp; </label>
+							<input type="checkbox" id="negative" value="negativea." v-model="checkedEmotions" v-on:click="updateEmotions('negativea.')">
+							<span class="colorBox" style="background-color: #ED553B; height: 10px;"> &nbsp;</span>
+							</li>
+					</ul>
+				</div>
+
+				<div class="product">
+					<h3>Your Comments</h3>
+
+
+					<div class="product-info" style="margin: 5px;">
+
+						<!-- <p>
+							INSTRUCTIONS: Double click on any element to leave us a comment. This information will be used to help us
+							design the new patient room.
+						</p> -->
+
+						<p>
+							<strong>Name: </strong>{{ name[0] }} <br>
+							<strong>Department: </strong> {{ department[0] }}<br>
+						</p>
+
+
+						<table>
+							<tr>
+								<th>
+									Delete
+								</th>
+								<!-- <th>
+									Element Name
+								</th> -->
+								<th>
+									Comment
+								</th>
+								<!-- <th>
+									Emotion
+								</th> -->
+							</tr>
+							<tr v-for="(object, index) in objects">
+								<td v-show="show[index] == 1">
+									<button v-on:click="deleteThis(index)">x</button>
+								</td>
+								<!-- <td v-show="show[index] == 1">
+									{{object}}
+								</td> -->
+								<td v-show="show[index] == 1">
+									{{text[index]}}
+									<!-- <input type="textbox"> -->
+								</td>
+								<!-- <td v-show="show[index] == 1">
+									{{emotion[index]}}
+								</td> -->
+
+							</tr>
+						</table>
+
+					</div>
+
+				
+			</div>
+
+			</div><br><br>
+		
+		</div><br>
+		<!-- <button v-on:click="addCluster()">+ GROUP</button><br><br> -->
+		<div style="margin: 5px;">
+			<h3>Switch Cameras</h3>
+		<button onclick="changeCamera(0)" id="update" style="width: 30%; height:40px; font-size: 20; ">Cam 1</button>
+		<button onclick="changeCamera(1)" id="update" style="width: 30%; height:40px; font-size: 20; ">Cam 2</button>
+		<button onclick="changeCamera(2)" id="update" style="width: 30%; height:40px; font-size: 20; ">Cam 3</button><br><br><br><br><br><br><br>
+	</div>
+		<!-- </div> -->
+
+		<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+
+		
+	</div><br><br><br><br><br><br><br>
+</div>
+
+	</div>
+
+	<!-- INFO SIDEBAR -->
+	<div id="mySidenav2" class="sidenav2" style="z-index: 200; width:250px; background-color: rgba(255, 255, 255, 1)">
+		<!-- <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a> -->
+		<div id="overlay" style="width: 36%; display: inline-block; margin: auto;">
+			<div
+				style="top:0px; height:100%; position: absolute; background-color: rgba(255, 255, 255, 1) !important; z-index: 5;">
+
+
+
+				<button style="margin-left: 10%; width: 80%; height: 40px;"><a href="javascript:void(0)" class="closebtn" onclick="closeNav2()">HIDE INFO</a></button><br><br>
+				<h2 style="margin:12px; text-align: center;"> Welcome to the VIRTUAL MOCKUP</h2>
+				<div style="margin: 5px">
+					<p>This website is designed to show key user groups the current design for teaching labs in the upcoming LSU Building.</p>
+					
+					<ul>
+						<li>
+							<b style="font-size: larger;">How to use</b>
+						</li>
+						<li>
+							Double-click to leave a note
+						</li>
+						<li>
+							Click and drag to move the camera
+						</li>
+						<li>
+							Use circles on the floor to move camera
+						</li>
+					</ul>
+				</div>
+				<div style="margin: 5px">
+					<ul>
+						<li>
+							<b>Settings</b>
+						</li>
+						<li>
+							Filter other visitors comments
+						</li>
+						<li>
+							Cycle through cameras
+						</li>
+						<li>
+							View/Delete your comments
+						</li>
+					</ul>
+				</div>
+
+				
+
+				<div style="margin: 5px">
+					<p>
+						
+						<h3>Detailed Instructions:</h3>
+						
+						<p>You can explore the room by clicking/dragging your mouse around the screen. 
+							This will allow you to view a 360 degree view of a single camera view. 
+							To see the room from a different vantage point, either click on the circle on the floor, or press "View Next Camera" in the settings bar to cycle through the different preset views.</p>
+						
+							<p>As you are looking around the room you may see something that you want to leave us a comment about. 
+						This could be a positive aspect you like, a question you have, or something you think we should change/remove. 
+						To leave us this note - double click on any element in the room. 
+						A text box will appear, and you will be prompted to provide additional information about why you left that note for us.</p>
+						
+						<p>At any point you can view a list of all of your notes, and the option to delete them in the Settings sidebar.</p>
+						
+					<p>Finally, you can also view all of the previous notes provided by earlier visitors to the site, and filter by sentiment (positive, neutral, negative) or department.</p></p><br><br><br><br><br><br>
+				</div>
+
+
+
+			</div>
+
+
+			<div>
+
+			</div>
+		</div>
+
+	</div>
+
+
+	<!-- CANVAS -->
+	<div id="container" style="top:0px;">
+
+	</div>
+
+	<!-- LOGIN MODAL -->
+	<div class="c-modal" id="login">
+		<div class="c-modal__inner">
+			<h2 class="c-modal__headline" style="color: darkgray;">Sign In</h2>
+			<!-- <a href="#login" class="c-modal__close" aria-label="Close modal"></a> -->
+			<div class="c-modal__content">
+				<label>Name (optional) </label>
+				<input id='username' type="text" style="width:100%; margin-top: 5px; margin-left: 0px;"><br><br>
+	
+				<label>Tell us about yourself* </label>
+				<select name="dept" id="dept" style="width:100%; margin-left: 0px;">
+					<option value="Resident">LSU - Student</option>
+					<option value="Family">LSU - Faculty Member</option>
+					<option value="Staff">LSU - Staff Member</option>
+					<option value="Official">Federal/State/Local Official</option>
+					<option value="Veteran">Alumni or member of community</option>
+					<option value="Other">Other (please specify in name field)</option>
+				</select>
+				<p>*required field</p>
+
+			</div>
+
+			<div class="c-modal__nav" style="width: 100%;">
+
+				<button onclick="enteredUserData()" style="width: 100%; font-size: larger; height: 50px;">Enter</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- COMMENT MODAL -->
+	<div class="c-modal" id="modal" style="background-image: none;">
+		<div class="c-modal__inner">
+			<h2 class="c-modal__headline">YOU CLICKED ON:</h2>
+			<h2 class="c-modal__headline" id="putObjectNameHere"></h2>
+
+			<div class="c-modal__content">
+				<table style="max-width: 55vw;">
+					<tr>
+
+						
+						<th>
+							Rating:
+						</th>
+						<th>
+							Please elaborate on the rating you provided:
+						</th>
+					</tr>
+					<tr>
+
+						
+						<td style="width: 38%;">
+							<input style="width: 10px; display: inline-block; background-color: #ED553B  !important;" type="radio" id="negative" name="emotion"
+								value="negative">
+							<label style="display: inline-block; width: auto;" for="negative">Design not desirable</label>
+							<br>
+
+							<input style="width: 10px; display: inline-block; background-color: #F6D55C !important" type="radio" id="neutral" name="emotion"
+								value="neutral">
+							<label style="display: inline-block; width: auto;" for="neutral">OK but needs improvement </label>
+							<br>
+
+							<input style="width: 10px; display: inline-block; background-color: #3CAEA3 !important" type="radio" id="positve" name="emotion"
+								value="positve" checked>
+							<label style="display: inline-block; width: auto;" for="positive">Positive, design is desirable</label>
+							<br>
+
+
+
+						</td>
+						<td style="width: 60%;">
+							<!-- <input type="text" id="userText" style="width: 100%;"> -->
+							<textarea id="userText" rows="4" cols="50" style="width: 95%; border-radius: 1rem;" maxlength="240"></textarea>
+						</td>
+
+					</tr>
+				</table>
+			</div>
+			<p>max comment length: 240 characters. To leave a more detailed comment, please contact info@email.com</p>
+
+			<div class="c-modal__nav">
+
+				<!-- <a href="#" class="c-modal__cancel"> -->
+				<button onclick="popLastElement()">Cancel</button>
+				<!-- </a> -->
+				<button onclick="pushElement()">Accept</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- INSTRUCTIONS MODAL -->
+	<div class="c-modal" id="instructions" style="background-image: none;">
+		<div class="c-modal__inner">
+			<h2 class="c-modal__headline">Instructions:</h2>
+			<a href="#" class="c-modal__close" aria-label="Close modal"></a>
+			<div class="c-modal__content">
+				<img src='./textures/icons/icon2.png' width="295px" style="margin-left: 18%; text-align: center; align-content: center;" id="instructionIMG">
+				<p style='text-align: center; width: 500px;' id="instructionTXT">Look around the room by clicking and dragging anywhere in the 3D scene.</p></div>
+				<p style="text-align: center;"><i class="fas fa-circle" id="circle1"></i> &nbsp; <i class="far fa-circle" id="circle2"></i> &nbsp; <i class="far fa-circle" id="circle3"></i></p>
+				<button type="button" onclick="clickedPrev()" style="float: left;">Prev</button>
+
+				<button type="button" onclick="clickedNext()" style="float:right">Next</button>
+			<!-- </div> -->
+		</div>
+	</div>
+
+
+<!-- GLOBAL VARIABLES AND VUE -->
+	<script>
+		let scene;
+
+		let colorBy = true;
+
+		let listOfClickedObjects = []
+		let commentBalls = []
+		let userText = []
+		let emotion1 = []
+		let commentsVector = { x: 0, y: 0, z: 0 }
+		let username = []
+		let actualUsername = ''
+		let dept = []
+		let setInfo = false;
+		let showInTable = [];
+		let runningCountOfComments = 0
+		let commentPosition = { x: 0, y: 0, z: 0 }
+		let elementName = ''
+
+		let currentCameraPosition = 0;
+		let hasEnteredScene = false;
+
+		let currentInstruction = 0;
+
+		
+		//INSTRUCTIONS NAV - NEXT
+		function clickedNext(){
+			currentInstruction++
+			if(currentInstruction > 2){
+				currentInstruction = 0
+			}
+
+			if(currentInstruction == 0){
+			document.getElementById('instructionIMG').src = './textures/icons/icon2.png';
+			document.getElementById('instructionTXT').innerHTML = "Look around the room by <b>clicking and dragging</b> anywhere in the 3D scene."
+			document.getElementById('circle1').className = "fas fa-circle"
+			document.getElementById('circle2').className = "far fa-circle"
+			document.getElementById('circle3').className = "far fa-circle"
+			}else if(currentInstruction == 1){
+			document.getElementById('instructionIMG').src = './textures/icons/icon3.png';
+			document.getElementById('instructionTXT').innerHTML = "Move to a different location in the room by <b>clicking on a floor circle</b>."
+			document.getElementById('circle1').className = "far fa-circle"
+			document.getElementById('circle2').className = "fas fa-circle"
+			document.getElementById('circle3').className = "far fa-circle"
+			}else{
+			document.getElementById('instructionIMG').src = './textures/icons/icon1.png';
+			document.getElementById('instructionTXT').innerHTML = "Leave a comment anywhere in the room by <b>double clicking and entering your note</b>."
+			document.getElementById('circle1').className = "far fa-circle"
+			document.getElementById('circle2').className = "far fa-circle"
+			document.getElementById('circle3').className = "fas fa-circle"
+			}
+
+		}
+
+		//INSTRUCTIONS NAV - PREV
+		function clickedNPrev(){
+			currentInstruction--
+			if(currentInstruction < 0){
+				currentInstruction = 2
+			}
+
+			if(currentInstruction == 0){
+			document.getElementById('instructionIMG').src = './textures/icons/icon2.png';
+			document.getElementById('instructionTXT').innerHTML = "Look around the room by <b>clicking and dragging</b> anywhere in the 3D scene."
+			document.getElementById('circle1').className = "fas fa-circle"
+			document.getElementById('circle2').className = "far fa-circle"
+			document.getElementById('circle3').className = "far fa-circle"
+			}else if(currentInstruction == 1){
+			document.getElementById('instructionIMG').src = './textures/icons/icon3.png';
+			document.getElementById('instructionTXT').innerHTML = "Move to a different location in the room by <b>clicking on a floor circle</b>."
+			document.getElementById('circle1').className = "far fa-circle"
+			document.getElementById('circle2').className = "fas fa-circle"
+			document.getElementById('circle3').className = "far fa-circle"
+			}else{
+			document.getElementById('instructionIMG').src = './textures/icons/icon1.png';
+			document.getElementById('instructionTXT').innerHTML = "Leave a comment anywhere in the room by <b>double clicking and entering your note</b>."
+			document.getElementById('circle1').className = "far fa-circle"
+			document.getElementById('circle2').className = "far fa-circle"
+			document.getElementById('circle3').className = "fas fa-circle"
+			}
+
+		}
+
+		
+		//SETTINGS
+		function colorByEmotion(){
+			colorBy = true;
+		}
+
+		function colorByDepartment(){
+			colorBy = false;
+		}
+
+		//REMOVE COMMENT STICKY
+		function popLastElement() {
+			scene.remove(commentBalls[commentBalls.length - 1])
+			commentBalls.pop();
+			listOfClickedObjects.pop()
+			location.hash = "#";
+		}
+
+		//HIDE INSTRUCTIONS MODAL
+		function closeInstructions(){
+			location.hash = "#";
+		}
+
+		//PUSH USER TO FIREBASE
+		function enteredUserData() {
+			username.push(document.getElementById("username").value)
+			actualUsername = document.getElementById("username").value + "-" + parseInt(Math.random() * 1000)
+			dept.push(document.getElementById("dept").value)
+			setInfo = true;
+			console.log(document.getElementById("username").value)
+			location.hash = 'instructions'
+			hasEnteredScene = true;
+			//add firebase sender
+			writeNewUser(dept[0], 1)
+		}
+
+		//SETTINGS CHANGE CAMERA POSITION
+		function changeCamera(x) {
+				currentCameraPosition = x;
+		}
+
+		//ADD STICKYNOTE TO STICKY ARRAY AND PUSH DATA TO FIREBASE USER
+		function pushElement() {
+			showInTable.push(1)
+			console.log(document.getElementById("userText").value)
+			let myComment = document.getElementById("userText").value + "."
+			userText.push(myComment)
+			// emotion1.push(document.getElementById("emotion").value)
+			let myEmotion = document.querySelector('input[name="emotion"]:checked').value
+			emotion1.push(myEmotion);
+
+			writeNewPost(actualUsername, commentPosition, myEmotion + "a", myComment, dept[0], elementName + "a", 0, runningCountOfComments, commentsVector)
+			location.hash = "#";
+			runningCountOfComments++
+		}
+
+		checkedDepts = [] //"Resident", "Family", "Staff", "Official", "Veteran", "Other"
+		checkedEmos = [] //"positivea.", "neutrala.", "negativea."
+
+
+		// VUE APP
+		var app = new Vue({
+			el: '#app',
+			data: {
+				name: username,
+				department: dept,
+				entered: setInfo,
+				objects: listOfClickedObjects,
+				balls: commentBalls,
+				text: userText,
+				emotion: emotion1,
+				show: showInTable,
+				checkedDepartments: [],
+				checkedEmotions: []
+			},// define methods under the `methods` object
+			methods: {
+				deleteThis: function (x) {
+					showInTable[x] = 0;
+					console.log(x)
+					showInTable.push(0)
+					showInTable.pop()
+					scene.remove(commentBalls[x])
+					commentBalls.remove(x)
+					listOfClickedObjects.remove(x)
+
+				},
+				updateDepts: function(name){
+					checkedDepts = []
+					for(let i = 0; i<this.checkedDepartments.length; i++){
+						checkedDepts.push(this.checkedDepartments[i]);
+					}
+					
+					if(!checkedDepts.includes(name)){
+						checkedDepts.push(name)
+					}else{
+						let i = checkedDepts.indexOf(name);
+						checkedDepts.splice(i, 1)
+					}
+					console.log(checkedDepts)
+				},
+				updateEmotions: function(name){
+					checkedEmos = []
+					for(let i = 0; i<this.checkedEmotions.length; i++){
+						checkedEmos.push(this.checkedEmotions[i]);
+					}
+					
+					if(!checkedEmos.includes(name)){
+						checkedEmos.push(name)
+					}else{
+						let i = checkedEmos.indexOf(name);
+						checkedEmos.splice(i, 1)
+					}
+					console.log(checkedEmos)
+				}
+			}
+		})
+
+	</script>
+
+
+	<script type="module" src="main1-LSU.js"></script>
+
+</body>
+
+</html>
